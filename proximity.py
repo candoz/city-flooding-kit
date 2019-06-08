@@ -1,9 +1,9 @@
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTShadowClient
 
-import logging
+import RPi.GPIO as GPIO
 import json
-import time
+import time, datetime
 
 # First you need to configure the SDK settings
 # Usually looks like this:
@@ -64,19 +64,20 @@ def distance():
 
     # time difference between start and arrival
     TimeElapsed = StopTime - StartTime
-    # multiply with the sonic speed (34300 cm/s)
-    # and divide by 2, because there and back
+    # multiply with the sonic speed (34300 cm/s) and divide by 2, because there and back
     distance = (TimeElapsed * 34300) / 2
 
     return distance
 
 if __name__ == '__main__':
     try:
+        counter = 0
         while True:
+            counter = counter + 1
             dist = distance()
             now = datetime.datetime.now()  # Store current datetime
             now_str = now.isoformat()  # Convert to ISO 8601 string
-            msg = '{"value":"' + str(dist) + '", "timestamp":"' + now_str + '", "emergency":false}'
+            msg = '{"counter":' + str(counter) + ', "value":' + str(round(dist)) + ', "timestamp":"' + now_str + '", "emergency":false}'
             print ("Measured Distance = %.1f cm" % dist)
             print ("Datetime = " + now_str)
             aws_iot_mqtt_client.publish(topic, msg, 0)
