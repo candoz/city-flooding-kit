@@ -10,10 +10,10 @@ import time, datetime
 aws_iot_mqtt_client = None
 aws_iot_mqtt_client = AWSIoTMQTTClient("basicPubSub")
 port = 8883
-host = "azzh4c40pkqc9-ats.iot.us-east-1.amazonaws.com"
-rootCA_path = "./AmazonRootCA1.pem"
-private_key_path = "./acb5e1e298-private.pem.key"
-certificate_path = "./acb5e1e298-certificate.pem.crt"
+host = "azhkicv1gj9gc-ats.iot.us-east-2.amazonaws.com"
+rootCA_path = "./certs/AmazonRootCA1.pem"
+private_key_path = "./certs/19ecbe119d-private.pem.key"
+certificate_path = "./certs/19ecbe119d-certificate.pem.crt"
 
 aws_iot_mqtt_client.configureEndpoint(host, port)
 aws_iot_mqtt_client.configureCredentials(rootCA_path, private_key_path, certificate_path)
@@ -32,6 +32,7 @@ def topic_callback(client, userdata, message):
     print()
 
 topic = "floodingKit/proximitySensor"
+#topic = "$aws/things/FloodingKit/shadow/update"
 
 aws_iot_mqtt_client.connect()
 
@@ -77,7 +78,7 @@ if __name__ == '__main__':
             dist = distance()
             now = datetime.datetime.now()  # Store current datetime
             now_str = now.isoformat()  # Convert to ISO 8601 string
-            msg = '{"counter":' + str(counter) + ', "value":' + str(round(dist)) + ', "timestamp":"' + now_str + '", "emergency":false}'
+            msg = '{"counterId":' + str(counter) + ', "value":' + str(round(dist)) + ', "timestamp":"' + now_str + '", "emergency":false}'
             print ("Measured Distance = %.1f cm" % dist)
             print ("Datetime = " + now_str)
             aws_iot_mqtt_client.publish(topic, msg, 0)
