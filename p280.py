@@ -4,14 +4,39 @@
 # This code is designed to work with the BMP280_I2CS I2C Mini Module available from ControlEverything.com.
 # https://www.controleverything.com/content/Barometer?sku=BMP280_I2CSs#tabs-0-product_tabset-2
 
-
+from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
+from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTShadowClient
 import smbus
 import time
+
+# First you need to configure the SDK settings
+# Usually looks like this:
+aws_iot_mqtt_client = None
+aws_iot_mqtt_client = AWSIoTMQTTClient("basicPubSub")
+port = 8883
+host = "azhkicv1gj9gc-ats.iot.us-east-2.amazonaws.com"
+rootCA_path = "./certs/AmazonRootCA1.pem"
+private_key_path = "./certs/19ecbe119d-private.pem.key"
+certificate_path = "./certs/19ecbe119d-certificate.pem.crt"
+
+aws_iot_mqtt_client.configureEndpoint(host, port)
+aws_iot_mqtt_client.configureCredentials(rootCA_path, private_key_path, certificate_path)
+
+# AWSIoTMQTTClient connection configuration
+aws_iot_mqtt_client.configureAutoReconnectBackoffTime(1, 32, 20)
+aws_iot_mqtt_client.configureOfflinePublishQueueing(-1)  # Infinite offline Publish queueing
+aws_iot_mqtt_client.configureDrainingFrequency(2)  # Draining: 2 Hz
+aws_iot_mqtt_client.configureConnectDisconnectTimeout(10)  # 10 sec
+aws_iot_mqtt_client.configureMQTTOperationTimeout(5)  # 5 sec
+
+topic = "floodingKit/p280"
+
+aws_iot_mqtt_client.connect()
 
 # Get I2C bus
 bus = smbus.SMBus(1)
 
-while True:
+def getP280values():
     # BMP280 address, 0x76(118)
     # Read data back from 0x88(136), 24 bytes
     b1 = bus.read_i2c_block_data(0x76, 0x88, 24)
@@ -94,7 +119,18 @@ while True:
     var2 = p * (dig_P8) / 32768.0
     pressure = (p + (var1 + var2 + (dig_P7)) / 16.0) / 100
 
-    # Output data to screen
-    print "Temperature in Celsius : %.2f C" %cTemp
-    print "Pressure : %.2f hPa " %pressure
-    time.sleep(4.5)
+    return cTemp, pressure
+
+if __name__ == '__main__':
+    try:
+        counter = 0
+        while True:
+            counter = counter + 1
+            temperature, pressure = getP280values()
+            now = datetime.datetime.now()  # Store current datetime
+            now_str = now.isoformat()  # Convert to ISO 8601 string
+            msg = '{"counterId":' + str(counter) + ', "temperatureValue":' + str(temperature) + ' , "pressureValue":' + str(pressure) + ', "timestamp":"' + now_str + '", "emergency":false}'
+            print "Temperature in Celsius : %.2f C" %temperature
+            print "Pressure : %.2f hPa " %pressure
+            aws_iot_mqtt_client.publish(topic, msg, 0)
+            time.sleep(4.5)
