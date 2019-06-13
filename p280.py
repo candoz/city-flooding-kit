@@ -134,3 +134,4 @@ if __name__ == '__main__':
             print "Pressure : %.2f hPa " %pressure
             aws_iot_mqtt_client.publish(topic, msg, 0)
             time.sleep(4.5)
+            
