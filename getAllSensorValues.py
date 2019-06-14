@@ -1,17 +1,17 @@
+import time
+import datetime
+import json
+import smbus
+import RPi.GPIO as GPIO
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTShadowClient
 from ctypes import c_short
 from ctypes import c_byte
 from ctypes import c_ubyte
-import smbus
-import time, datetime
-import RPi.GPIO as GPIO
-import json
 
 DEVICE = 0x76 # 0x77 was default device I2C address
 
-# First you need to configure the SDK settings
-# Usually looks like this:
+# Configure SDK settings
 aws_iot_mqtt_client = None
 aws_iot_mqtt_client = AWSIoTMQTTClient("basicPubSub")
 port = 8883
