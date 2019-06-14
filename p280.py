@@ -120,14 +120,14 @@ def getP280values():
     var2 = p * (dig_P8) / 32768.0
     pressure = (p + (var1 + var2 + (dig_P7)) / 16.0) / 100
 
-      # Refine humidity
-      humidity = t_fine - 76800.0
-      humidity = (adc_h - (dig_H4 * 64.0 + dig_H5 / 16384.0 * humidity))
-      humidity = humidity * (dig_H2 / 65536.0 * (1.0 + dig_H6 / 67108864.0 * humidity * (1.0 + dig_H3 / 67108864.0 * humidity)))
-      humidity = humidity * (1.0 - dig_H1 * humidity / 524288.0)
-      if humidity > 100:
+    # Refine humidity
+    humidity = t_fine - 76800.0
+    humidity = (adc_h - (dig_H4 * 64.0 + dig_H5 / 16384.0 * humidity))
+    humidity = humidity * (dig_H2 / 65536.0 * (1.0 + dig_H6 / 67108864.0 * humidity * (1.0 + dig_H3 / 67108864.0 * humidity)))
+    humidity = humidity * (1.0 - dig_H1 * humidity / 524288.0)
+    if humidity > 100:
         humidity = 100
-      elif humidity < 0:
+    elif humidity < 0:
         humidity = 0
 
     return cTemp, pressure, humidity
