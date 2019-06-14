@@ -1,13 +1,30 @@
-# Distributed with a free-will license.
-# Use it any way you want, profit or free, provided it fits in the licenses of its associated works.
-# BMP280
-# This code is designed to work with the BMP280_I2CS I2C Mini Module available from ControlEverything.com.
-# https://www.controleverything.com/content/Barometer?sku=BMP280_I2CSs#tabs-0-product_tabset-2
-
-from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
-from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTShadowClient
+#!/usr/bin/python
+#--------------------------------------
+#    ___  ___  _ ____
+#   / _ \/ _ \(_) __/__  __ __
+#  / , _/ ___/ /\ \/ _ \/ // /
+# /_/|_/_/  /_/___/ .__/\_, /
+#                /_/   /___/
+#           bme280.py
+#
+#    Official datasheet available from :
+#    https://www.bosch-sensortec.com/bst/products/all_products/bme280
+#
+#    Authors : Matt Hawkins, Giulia Lucchi, Marco Canducci
+#    http://www.raspberrypi-spy.co.uk/
+#
+#--------------------------------------
 import smbus
 import time, datetime
+from ctypes import c_short
+from ctypes import c_byte
+from ctypes import c_ubyte
+from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
+
+DEVICE = 0x76 # 0x77 was default device I2C address
+
+bus = smbus.SMBus(1) # Rev 2 Pi, Pi 2 & Pi 3 uses bus 1
+                     # Rev 1 Pi uses bus 0
 
 # First you need to configure the SDK settings
 # Usually looks like this:
@@ -33,108 +50,150 @@ topic = "floodingKit/p280"
 
 aws_iot_mqtt_client.connect()
 
-# Get I2C bus
-bus = smbus.SMBus(1)
+def getShort(data, index):
+    # return two bytes from data as a signed 16-bit value
+    return c_short((data[index+1] << 8) + data[index]).value
 
-def getP280values():
-    # BMP280 address, 0x76(118)
-    # Read data back from 0x88(136), 24 bytes
-    b1 = bus.read_i2c_block_data(0x76, 0x88, 24)
+def getUShort(data, index):
+    # return two bytes from data as an unsigned 16-bit value
+    return (data[index+1] << 8) + data[index]
 
-    # Convert the data
-    # Temp coefficents
-    dig_T1 = b1[1] * 256 + b1[0]
-    dig_T2 = b1[3] * 256 + b1[2]
-    if dig_T2 > 32767 :
-        dig_T2 -= 65536
-    dig_T3 = b1[5] * 256 + b1[4]
-    if dig_T3 > 32767 :
-        dig_T3 -= 65536
+def getChar(data,index):
+    # return one byte from data as a signed char
+    result = data[index]
+    if result > 127:
+        result -= 256
+    return result
 
-    # Pressure coefficents
-    dig_P1 = b1[7] * 256 + b1[6]
-    dig_P2 = b1[9] * 256 + b1[8]
-    if dig_P2 > 32767 :
-        dig_P2 -= 65536
-    dig_P3 = b1[11] * 256 + b1[10]
-    if dig_P3 > 32767 :
-        dig_P3 -= 65536
-    dig_P4 = b1[13] * 256 + b1[12]
-    if dig_P4 > 32767 :
-        dig_P4 -= 65536
-    dig_P5 = b1[15] * 256 + b1[14]
-    if dig_P5 > 32767 :
-        dig_P5 -= 65536
-    dig_P6 = b1[17] * 256 + b1[16]
-    if dig_P6 > 32767 :
-        dig_P6 -= 65536
-    dig_P7 = b1[19] * 256 + b1[18]
-    if dig_P7 > 32767 :
-        dig_P7 -= 65536
-    dig_P8 = b1[21] * 256 + b1[20]
-    if dig_P8 > 32767 :
-        dig_P8 -= 65536
-    dig_P9 = b1[23] * 256 + b1[22]
-    if dig_P9 > 32767 :
-        dig_P9 -= 65536
+def getUChar(data,index):
+    # return one byte from data as an unsigned char
+    result =  data[index] & 0xFF
+    return result
 
-    # BMP280 address, 0x76(118)
-    # Select Control measurement register, 0xF4(244)
-    #		0x27(39)	Pressure and Temperature Oversampling rate = 1
-    #					Normal mode
-    bus.write_byte_data(0x76, 0xF4, 0x27)
-    # BMP280 address, 0x76(118)
-    # Select Configuration register, 0xF5(245)
-    #		0xA0(00)	Stand_by time = 1000 ms
-    bus.write_byte_data(0x76, 0xF5, 0xA0)
+def readBME280ID(addr=DEVICE):
+    # Chip ID Register Address
+    REG_ID     = 0xD0
+    (chip_id, chip_version) = bus.read_i2c_block_data(addr, REG_ID, 2)
+    return (chip_id, chip_version)
 
-    time.sleep(0.5)
+def readBME280All(addr=DEVICE):
+    # Register Addresses
+    REG_DATA = 0xF7
+    REG_CONTROL = 0xF4
+    REG_CONFIG  = 0xF5
 
-    # BMP280 address, 0x76(118)
-    # Read data back from 0xF7(247), 8 bytes
-    # Pressure MSB, Pressure LSB, Pressure xLSB, Temperature MSB, Temperature LSB
-    # Temperature xLSB, Humidity MSB, Humidity LSB
-    data = bus.read_i2c_block_data(0x76, 0xF7, 8)
+    REG_CONTROL_HUM = 0xF2
+    REG_HUM_MSB = 0xFD
+    REG_HUM_LSB = 0xFE
 
-   # Convert pressure and temperature data to 19-bits
-    adc_p = ((data[0] * 65536) + (data[1] * 256) + (data[2] & 0xF0)) / 16
-    adc_t = ((data[3] * 65536) + (data[4] * 256) + (data[5] & 0xF0)) / 16
-    adc_h = (data[6] << 8) | data[7]
+    # Oversample setting - page 27
+    OVERSAMPLE_TEMP = 2
+    OVERSAMPLE_PRES = 2
+    MODE = 1
 
-    # Temperature offset calculations
-    var1 = ((adc_t) / 16384.0 - (dig_T1) / 1024.0) * (dig_T2)
-    var2 = (((adc_t) / 131072.0 - (dig_T1) / 8192.0) * ((adc_t)/131072.0 - (dig_T1)/8192.0)) * (dig_T3)
-    t_fine = (var1 + var2)
-    cTemp = (var1 + var2) / 5120.0
+    # Oversample setting for humidity register - page 26
+    OVERSAMPLE_HUM = 2
+    bus.write_byte_data(addr, REG_CONTROL_HUM, OVERSAMPLE_HUM)
 
-    # Pressure offset calculations
-    var1 = (t_fine / 2.0) - 64000.0
-    var2 = var1 * var1 * (dig_P6) / 32768.0
-    var2 = var2 + var1 * (dig_P5) * 2.0
-    var2 = (var2 / 4.0) + ((dig_P4) * 65536.0)
-    var1 = ((dig_P3) * var1 * var1 / 524288.0 + ( dig_P2) * var1) / 524288.0
-    var1 = (1.0 + var1 / 32768.0) * (dig_P1)
-    p = 1048576.0 - adc_p
-    p = (p - (var2 / 4096.0)) * 6250.0 / var1
-    var1 = (dig_P9) * p * p / 2147483648.0
-    var2 = p * (dig_P8) / 32768.0
-    pressure = (p + (var1 + var2 + (dig_P7)) / 16.0) / 100
+    control = OVERSAMPLE_TEMP<<5 | OVERSAMPLE_PRES<<2 | MODE
+    bus.write_byte_data(addr, REG_CONTROL, control)
 
-    return cTemp, pressure
+    # Read blocks of calibration data from EEPROM
+    # See Page 22 data sheet
+    cal1 = bus.read_i2c_block_data(addr, 0x88, 24)
+    cal2 = bus.read_i2c_block_data(addr, 0xA1, 1)
+    cal3 = bus.read_i2c_block_data(addr, 0xE1, 7)
 
-if __name__ == '__main__':
+    # Convert byte data to word values
+    dig_T1 = getUShort(cal1, 0)
+    dig_T2 = getShort(cal1, 2)
+    dig_T3 = getShort(cal1, 4)
+
+    dig_P1 = getUShort(cal1, 6)
+    dig_P2 = getShort(cal1, 8)
+    dig_P3 = getShort(cal1, 10)
+    dig_P4 = getShort(cal1, 12)
+    dig_P5 = getShort(cal1, 14)
+    dig_P6 = getShort(cal1, 16)
+    dig_P7 = getShort(cal1, 18)
+    dig_P8 = getShort(cal1, 20)
+    dig_P9 = getShort(cal1, 22)
+
+    dig_H1 = getUChar(cal2, 0)
+    dig_H2 = getShort(cal3, 0)
+    dig_H3 = getUChar(cal3, 2)
+
+    dig_H4 = getChar(cal3, 3)
+    dig_H4 = (dig_H4 << 24) >> 20
+    dig_H4 = dig_H4 | (getChar(cal3, 4) & 0x0F)
+
+    dig_H5 = getChar(cal3, 5)
+    dig_H5 = (dig_H5 << 24) >> 20
+    dig_H5 = dig_H5 | (getUChar(cal3, 4) >> 4 & 0x0F)
+
+    dig_H6 = getChar(cal3, 6)
+
+    # Wait in ms (Datasheet Appendix B: Measurement time and current calculation)
+    wait_time = 1.25 + (2.3 * OVERSAMPLE_TEMP) + ((2.3 * OVERSAMPLE_PRES) + 0.575) + ((2.3 * OVERSAMPLE_HUM)+0.575)
+    time.sleep(wait_time/1000)  # Wait the required time
+
+    # Read temperature/pressure/humidity
+    data = bus.read_i2c_block_data(addr, REG_DATA, 8)
+    pres_raw = (data[0] << 12) | (data[1] << 4) | (data[2] >> 4)
+    temp_raw = (data[3] << 12) | (data[4] << 4) | (data[5] >> 4)
+    hum_raw = (data[6] << 8) | data[7]
+
+    #Refine temperature
+    var1 = ((((temp_raw>>3)-(dig_T1<<1)))*(dig_T2)) >> 11
+    var2 = (((((temp_raw>>4) - (dig_T1)) * ((temp_raw>>4) - (dig_T1))) >> 12) * (dig_T3)) >> 14
+    t_fine = var1+var2
+    temperature = float(((t_fine * 5) + 128) >> 8);
+
+    # Refine pressure and adjust for temperature
+    var1 = t_fine / 2.0 - 64000.0
+    var2 = var1 * var1 * dig_P6 / 32768.0
+    var2 = var2 + var1 * dig_P5 * 2.0
+    var2 = var2 / 4.0 + dig_P4 * 65536.0
+    var1 = (dig_P3 * var1 * var1 / 524288.0 + dig_P2 * var1) / 524288.0
+    var1 = (1.0 + var1 / 32768.0) * dig_P1
+    if var1 == 0:
+        pressure=0
+    else:
+        pressure = 1048576.0 - pres_raw
+        pressure = ((pressure - var2 / 4096.0) * 6250.0) / var1
+        var1 = dig_P9 * pressure * pressure / 2147483648.0
+        var2 = pressure * dig_P8 / 32768.0
+        pressure = pressure + (var1 + var2 + dig_P7) / 16.0
+
+    # Refine humidity
+    humidity = t_fine - 76800.0
+    humidity = (hum_raw - (dig_H4 * 64.0 + dig_H5 / 16384.0 * humidity))
+    humidity = humidity * (dig_H2 / 65536.0 * (1.0 + dig_H6 / 67108864.0 * humidity * (1.0 + dig_H3 / 67108864.0 * humidity)))
+    humidity = humidity * (1.0 - dig_H1 * humidity / 524288.0)
+    if humidity > 100:
+        humidity = 100
+    elif humidity < 0:
+        humidity = 0
+
+    return temperature/100.0,pressure/100.0,humidity
+
+def main():
     try:
         counter = 0
         while True:
             counter = counter + 1
-            temperature, pressure = getP280values()
+            temperature, pressure, humidity = readBME280All()
             now = datetime.datetime.now()  # Store current datetime
             now_str = now.isoformat()  # Convert to ISO 8601 string
-            msg = '{"counterId":' + str(counter) + ', "temperatureValue":' + str(temperature) + ' , "pressureValue":' + str(pressure) + ', "timestamp":"' + now_str + '", "emergency":false}'
-            print "Temperature in Celsius : %.2f C" %temperature
-            print "Pressure : %.2f hPa " %pressure
+            msg = '{"counterId":' + str(counter) + ', "temperatureValue":' + str(temperature) + ' , "pressureValue":' + str(pressure) + ' , "humidityValue":' + str(humidity) + ', "timestamp":"' + now_str + '", "emergency":false}'
+            print "Temperature : ", temperature, "C"
+            print "Pressure : ", pressure, "hPa"
+            print "Humidity : ", humidity, "%"
             aws_iot_mqtt_client.publish(topic, msg, 0)
-            time.sleep(4.5)
+            time.sleep(10)
     # Reset by pressing CTRL + C
     except KeyboardInterrupt:
         print("Measurement stopped by User")
+
+if __name__=="__main__":
+   main()
