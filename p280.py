@@ -120,30 +120,19 @@ def getP280values():
     var2 = p * (dig_P8) / 32768.0
     pressure = (p + (var1 + var2 + (dig_P7)) / 16.0) / 100
 
-    # Refine humidity
-    humidity = t_fine - 76800.0
-    humidity = (adc_h - (dig_H4 * 64.0 + dig_H5 / 16384.0 * humidity))
-    humidity = humidity * (dig_H2 / 65536.0 * (1.0 + dig_H6 / 67108864.0 * humidity * (1.0 + dig_H3 / 67108864.0 * humidity)))
-    humidity = humidity * (1.0 - dig_H1 * humidity / 524288.0)
-    if humidity > 100:
-        humidity = 100
-    elif humidity < 0:
-        humidity = 0
-
-    return cTemp, pressure, humidity
+    return cTemp, pressure
 
 if __name__ == '__main__':
     try:
         counter = 0
         while True:
             counter = counter + 1
-            temperature, pressure, humidity = getP280values()
+            temperature, pressure = getP280values()
             now = datetime.datetime.now()  # Store current datetime
             now_str = now.isoformat()  # Convert to ISO 8601 string
-            msg = '{"counterId":' + str(counter) + ', "temperatureValue":' + str(temperature) + ' , "pressureValue":' + str(pressure) + ', "humidityValue":' + str(humidity) + ', "timestamp":"' + now_str + '", "emergency":false}'
+            msg = '{"counterId":' + str(counter) + ', "temperatureValue":' + str(temperature) + ' , "pressureValue":' + str(pressure) + ', "timestamp":"' + now_str + '", "emergency":false}'
             print "Temperature in Celsius : %.2f C" %temperature
             print "Pressure : %.2f hPa " %pressure
-            print "Pressure : %.2f % " %humidity
             aws_iot_mqtt_client.publish(topic, msg, 0)
             time.sleep(4.5)
     # Reset by pressing CTRL + C
