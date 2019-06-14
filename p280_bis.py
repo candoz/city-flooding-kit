@@ -19,6 +19,7 @@ import time, datetime
 from ctypes import c_short
 from ctypes import c_byte
 from ctypes import c_ubyte
+from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 
 DEVICE = 0x76 # 0x77 was default device I2C address
 
