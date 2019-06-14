@@ -1,9 +1,14 @@
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTShadowClient
+from ctypes import c_short
+from ctypes import c_byte
+from ctypes import c_ubyte
 import smbus
 import time, datetime
 import RPi.GPIO as GPIO
 import json
+
+DEVICE = 0x76 # 0x77 was default device I2C address
 
 # First you need to configure the SDK settings
 # Usually looks like this:
@@ -40,7 +45,7 @@ GPIO_ECHO = 23
 GPIO.setup(GPIO_TRIGGER, GPIO.OUT)
 GPIO.setup(GPIO_ECHO, GPIO.IN)
 
-def distance():
+def readDistance():
     # set Trigger to HIGH
     GPIO.output(GPIO_TRIGGER, True)
 
@@ -198,19 +203,20 @@ if __name__ == '__main__':
         counter = 0
         while True:
             counter = counter + 1
-            dist = distance()
+            distance = readDistance()
             temperature, pressure, humidity = readBME280All()
             now = datetime.datetime.now()  # Store current datetime
             now_str = now.isoformat()  # Convert to ISO 8601 string
-            msg = '{"counterId":' + str(counter) + ', "proximity":' + str(round(dist)) + ', "temperature":' + str(temperature) + ', "humidity":' + str(humidity) + ', "pressure":' + str(pressure) +  ', "timestamp":"' + now_str + '", "emergency":false}'
-            print ("Measured Distance = %.1f cm" % dist)
+            msg = '{"counterId":' + str(counter) + ', "proximity":' + str(round(distance)) + ', "temperature":' + str(temperature) + ', "humidity":' + str(humidity) + ', "pressure":' + str(pressure) +  ', "timestamp":"' + now_str + '"}'
+            print ("Measured Distance = %.1f cm" % distance)
             print ("Measured Pressure = %.1f mPa" % pressure)
             print ("Measured Temperature = %.1f C" % temperature)
-            print ("Measured Humidity = %.1f %" % humidity)
+            print ("Measured Humidity = %.1f %%" % humidity)
             print ("Datetime = " + now_str)
             aws_iot_mqtt_client.publish(topic, msg, 0)
             time.sleep(5)
             # Reset by pressing CTRL + C
     except KeyboardInterrupt:
         print("Measurement stopped by User")
+    finally:
         GPIO.cleanup()
