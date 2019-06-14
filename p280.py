@@ -7,7 +7,7 @@
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTShadowClient
 import smbus
-import time
+import time, datetime
 
 # First you need to configure the SDK settings
 # Usually looks like this:
@@ -146,3 +146,6 @@ if __name__ == '__main__':
             print "Pressure : %.2f % " %humidity
             aws_iot_mqtt_client.publish(topic, msg, 0)
             time.sleep(4.5)
+    # Reset by pressing CTRL + C
+    except KeyboardInterrupt:
+        print("Measurement stopped by User")
