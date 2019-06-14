@@ -214,9 +214,8 @@ if __name__ == '__main__':
             print ("Measured Humidity = %.1f %%" % humidity)
             print ("Datetime = " + now_str)
             aws_iot_mqtt_client.publish(topic, msg, 0)
-            time.sleep(5)
-            # Reset by pressing CTRL + C
+            time.sleep(8)
     except KeyboardInterrupt:
-        print("Measurement stopped by User")
+        print("\nMeasurement stopped by the User")
     finally:
         GPIO.cleanup()
