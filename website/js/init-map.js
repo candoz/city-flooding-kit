@@ -14,45 +14,29 @@ fetch("https://54q6hpps8a.execute-api.us-east-2.amazonaws.com/prod/manager", {
         }
     )
 }).then(function(response) {
-    console.log("Dentro la response")
-   return response.json();
-   /* //definizione dei markers di default con relativo popup
-    var marker1 = L.marker([44.1247, 12.3966], {clickable: false});
-    var marker2 = L.marker([44.1161, 12.3867]).bindPopup('<b>Marker2</b>:<br>Università di Perugia');
-    var marker3 = L.marker([43.1021, 12.3893]).bindPopup('<b>Marker3</b>:<br>Parco Sant\'Anna');
-    
-    //aggiunta marker nella mappa
-    marker1.addTo(map);
-    marker2.addTo(map);
-    marker3.addTo(map);**/
-
+console.log("Dentro la response")
+    return response.json();
+  
 }).then(function(responseData){
-    console.log("ehiii  "+ responseData);
+    responseData.Items.forEach(element => {
+        const lat = element.latitude
+        const lon = element.longitude
+        
+        var marker = L.marker([lat, lon]);
+        marker.on('click',function (e) {
+            window.location.href = "./sensorForKit.html";
+        });
+        
+        marker.on('mouseover', function (e) {marker
+            this.openPopup();
+        });
+        marker.on('mouseout', function (e) {
+            this.closePopup();
+        });
+
+        const title = "<p align='center'>"+element.kitId+"</p> <p align='center'>latitude:"+ lat + " longitude:"+ lon+"</p>"; 
+        marker.bindPopup(title).addTo(map);
+    });
+    
 
 }).catch(error => console.error(error))
-
-// var http = new XMLHttpRequest();
-// var url = 'https://54q6hpps8a.execute-api.us-east-2.amazonaws.com/prod/manager';
-// http.open('POST', url, true);
-// http.setRequestHeader('Content-type', 'application/json');
-
-// http.onreadystatechange = function() {
-//     if (http.readyState == XMLHttpRequest.DONE) {
-//         console.log("Helloooooo")
-//         console.log(http.responseType);
-//     }
-// }
-// http.send(JSON.stringify({ "operation": "echo", "payload": { "TableName": "Kits" } }))
-
-    // do something with myJson
-  
- /*
- //definizione dei markers di default con relativo popup
- var marker1 = L.marker([44.1247, 12.3966], {clickable: false});
- var marker2 = L.marker([44.1161, 12.3867]).bindPopup('<b>Marker2</b>:<br>Università di Perugia');
- var marker3 = L.marker([43.1021, 12.3893]).bindPopup('<b>Marker3</b>:<br>Parco Sant\'Anna');
- 
- //aggiunta marker nella mappa
- marker1.addTo(map);
- marker2.addTo(map);
- marker3.addTo(map);*/
