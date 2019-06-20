@@ -42,7 +42,7 @@ nav {
   top: 0;
   width: 100%;
   /* list-style-type: none; */
-  margin: 0;
+  margin: 10;
   padding: 0px 12px;
   overflow: hidden;
   background-color: #333;
@@ -54,7 +54,6 @@ nav li {
   
   text-decoration: none;
   font-size: 110%; */
-
   display: block;
   color: white;
   text-align: center;

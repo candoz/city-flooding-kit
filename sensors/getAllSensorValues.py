@@ -30,7 +30,7 @@ aws_iot_mqtt_client.configureDrainingFrequency(2)  # Draining: 2 Hz
 aws_iot_mqtt_client.configureConnectDisconnectTimeout(10)  # 10 sec
 aws_iot_mqtt_client.configureMQTTOperationTimeout(5)  # 5 sec
 
-topic = "floodingKit/allValues"
+topic = "flooding-kit/ponte-vecchio-kit"
 
 aws_iot_mqtt_client.connect()
 

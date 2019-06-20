@@ -1,9 +1,7 @@
 <template>
   <div id="app">
     <nav-bar></nav-bar>
-    <div>
-      <leaflet-map></leaflet-map>
-    </div>
+    <leaflet-map></leaflet-map>
   </div>
 </template>
 
