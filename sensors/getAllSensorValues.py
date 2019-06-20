@@ -207,7 +207,7 @@ if __name__ == '__main__':
             temperature, pressure, humidity = readBME280All()
             now = datetime.datetime.now()  # Store current datetime
             now_str = now.isoformat()  # Convert to ISO 8601 string
-            msg = '{"counterId":' + str(counter) + ', "proximity":' + str(round(distance)) + ', "temperature":' + str(temperature) + ', "humidity":' + str(humidity) + ', "pressure":' + str(pressure) +  ', "timestamp":"' + now_str + '"}'
+            msg = '{"counterId":' + str(counter) + ', "proximity":' + str(round(distance)) + ', "temperature":' + str(temperature) + ', "humidity":' + str(humidity) + ', "pressure":' + str(pressure) +  ', "measureTime":"' + now_str + '"}'
             print ("Measured Distance = %.1f cm" % distance)
             print ("Measured Pressure = %.1f mPa" % pressure)
             print ("Measured Temperature = %.1f C" % temperature)
