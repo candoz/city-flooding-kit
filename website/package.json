@@ -1,35 +1,41 @@
 {
-  "name": "city-flooding-kit",
-  "description": "A Vue.js serverless project for the Smart City course.",
-  "version": "1.0.0",
-  "author": "Marco Canducci, Giulia Lucchi",
-  "license": "MIT",
-  "private": true,
-  "scripts": {
-    "dev": "cross-env NODE_ENV=development webpack-dev-server --open --hot",
-    "build": "cross-env NODE_ENV=production webpack --progress --hide-modules",
-    "deploy": "aws s3 sync --acl public-read --delete dist/ s3://provasmart"
-  },
-  "dependencies": {
-    "leaflet": "^1.5.1",
-    "vue": "^2.5.11"
-  },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not ie <= 8"
-  ],
-  "devDependencies": {
-    "babel-core": "^6.26.0",
-    "babel-loader": "^7.1.2",
-    "babel-preset-env": "^1.6.0",
-    "babel-preset-stage-3": "^6.24.1",
-    "cross-env": "^5.0.5",
-    "css-loader": "^0.28.7",
-    "file-loader": "^1.1.4",
-    "vue-loader": "^13.0.5",
-    "vue-template-compiler": "^2.4.4",
-    "webpack": "^3.6.0",
-    "webpack-dev-server": "^2.9.1"
-  }
+    "title": "Bare",
+    "name": "startbootstrap-bare",
+    "version": "4.2.1",
+    "scripts": {
+        "start": "node_modules/.bin/gulp watch"
+    },
+    "description": "A basic HTML starter template for Bootstrap",
+    "keywords": [
+        "css",
+        "sass",
+        "html",
+        "responsive",
+        "theme",
+        "template"
+    ],
+    "homepage": "https://startbootstrap.com/template-overviews/bare",
+    "bugs": {
+        "url": "https://github.com/BlackrockDigital/startbootstrap-bare/issues",
+        "email": "feedback@startbootstrap.com"
+    },
+    "license": "MIT",
+    "author": "Start Bootstrap",
+    "contributors": [
+        "David Miller (http://davidmiller.io/)"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/BlackrockDigital/startbootstrap-bare.git"
+    },
+    "dependencies": {
+        "bootstrap": "4.3.1",
+        "jquery": "3.4.1"
+    },
+    "devDependencies": {
+        "browser-sync": "2.26.7",
+        "del": "^4.1.1",
+        "gulp": "4.0.2",
+        "merge-stream": "2.0.0"
+    }
 }
