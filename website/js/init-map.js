@@ -23,10 +23,11 @@ console.log("Dentro la response")
         const namePopup = kitId.split("-").join(" ").toUpperCase();
         
         var marker = L.marker([lat, lon]);
-        marker.on('click',function (e) {
-            window.location.href = "./sensorForKit.html?kitId="+kitId;
-        });
 
+        marker.on('click',function (e) {
+            marker.
+            window.location.href = "./sensor-kit.html?kitId="+kitId;
+        });
         marker.on('mouseover', function (e) {
             this.openPopup();
         });
