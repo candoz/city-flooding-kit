@@ -1,7 +1,8 @@
-import AWS from 'aws-sdk/global'
+import aws from 'aws-sdk/global'
 import AWSMqttClient from 'aws-mqtt'
-AWS.config.region = 'us-east-2'; // Region
-AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+
+aws.config.region = 'us-east-2'; // Region
+aws.config.credentials = new AWS.CognitoIdentityCredentials({
     IdentityPoolId: 'us-east-2:c3a218d8-1a75-421f-a3a2-21f77683cf25',
 });
  
@@ -23,7 +24,7 @@ client.on('connect', () => {
   client.subscribe('flooding-kit/ponte-vecchio-kit')
 })
 client.on('message', (topic, message) => {
-  console.log(topic, message)
+  console.log('flooding-kit/ponte-vecchio-kit', message)
 })
 client.on('close', () => {
   // ...
