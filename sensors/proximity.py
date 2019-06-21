@@ -11,9 +11,9 @@ aws_iot_mqtt_client = None
 aws_iot_mqtt_client = AWSIoTMQTTClient("basicPubSub")
 port = 8883
 host = "azhkicv1gj9gc-ats.iot.us-east-2.amazonaws.com"
-rootCA_path = "./certs/AmazonRootCA1.pem"
-private_key_path = "./certs/19ecbe119d-private.pem.key"
-certificate_path = "./certs/19ecbe119d-certificate.pem.crt"
+rootCA_path = "./certs/flooding-kit/AmazonRootCA1.pem"
+private_key_path = "./certs/flooding-kit/19ecbe119d-private.pem.key"
+certificate_path = "./certs/flooding-kit/19ecbe119d-certificate.pem.crt"
 
 aws_iot_mqtt_client.configureEndpoint(host, port)
 aws_iot_mqtt_client.configureCredentials(rootCA_path, private_key_path, certificate_path)
