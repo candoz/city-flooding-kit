@@ -31,14 +31,14 @@ fetch("https://54q6hpps8a.execute-api.us-east-2.amazonaws.com/prod/manager", {
         const namePopup = kitId.split("-").join(" ").toUpperCase()
         const marker = L.marker([lat, lon])
 
-        marker.on('click', _ => {
-            marker.window.location.href = "./sensor-kit.html?kitId=" + kitId;
+        marker.on('click', function(_) {
+           window.location.href = "./sensor-kit.html?kitId=" + kitId
         })
-        marker.on('mouseover', _ => {
-            this.openPopup();
+        marker.on('mouseover', function(_) {
+            this.openPopup()
         })
-        marker.on('mouseout', _ => {
-            this.closePopup();
+        marker.on('mouseout', function(_) {
+            this.closePopup()
         })
         const title = "<p align='center'>" + namePopup + "</p> <p align='center'>latitude:" + lat + " longitude:" + lon + "</p>"; 
         marker.bindPopup(title).addTo(map)
