@@ -10,11 +10,11 @@ var urlParams = new URLSearchParams(window.location.search);
             }
         }
     )
-}).then(function(response) {
+}).then(response => {
 console.log("Dentro la response")
     return response.json();
   
-}).then(function(responseData){
+}).then(responseData => {
     const element = responseData.Items[0];
     const humidity = "value: "+element.humidity
     const pressure = "value: "+element.pressure

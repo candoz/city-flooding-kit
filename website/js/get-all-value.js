@@ -10,11 +10,12 @@ var urlParams = new URLSearchParams(window.location.search);
             }
         }
     )
-}).then(function(response) {
+
+}).then(response => {
 console.log("Dentro la response")
     return response.json();
   
-}).then(function(responseData){
+}).then(responseData => {
     responseData.Items.forEach(element => {
         const humidity = "value: "+element.humidity
         const pressure = "value: "+element.pressure
@@ -24,10 +25,8 @@ console.log("Dentro la response")
         
         document.getElementById("history").innerHTML = '<h6>' + cells + '<\/h6>';
     });
-   
-    
     timestamp = timestamp.replace("T"," ")
-       
+
     document.getElementById("value-pressure").innerHTML=pressure;
     document.getElementById("value-humidity").innerHTML=humidity;
     document.getElementById("value-proximity").innerHTML=proximity;
