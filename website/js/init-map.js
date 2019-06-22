@@ -19,7 +19,6 @@ fetch("https://54q6hpps8a.execute-api.us-east-2.amazonaws.com/prod/manager", {
     )
 
 }).then(response => {
-    console.log("Dentro la response")
     return response.json()
 
 }).then(responseData => {
