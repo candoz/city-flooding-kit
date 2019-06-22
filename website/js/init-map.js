@@ -48,6 +48,6 @@ fetch("https://54q6hpps8a.execute-api.us-east-2.amazonaws.com/prod/manager", {
 
 }).then(markers => {
     const group = new L.featureGroup(markers)
-    map.fitBounds(group.getBounds().pad(0.5))
+    map.fitBounds(group.getBounds().pad(0.2))
 
 }).catch(error => console.error(error))
