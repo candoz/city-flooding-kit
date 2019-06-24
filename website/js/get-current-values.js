@@ -24,7 +24,7 @@ fetch("https://54q6hpps8a.execute-api.us-east-2.amazonaws.com/prod/manager", {
         const pressure = "value: "+element.pressure
         const proximity = "value: "+element.proximity
         const temperature = "value: "+element.temperature
-        var timestamp = "timestamp: "+element.ciao
+        var timestamp = "timestamp: "+element.when
         timestamp = timestamp.replace("T"," ")
         
         document.getElementById("value-pressure").innerHTML = pressure
