@@ -21,7 +21,7 @@ fetch("https://54q6hpps8a.execute-api.us-east-2.amazonaws.com/prod/manager", {
         const pressure = "value: "+element.pressure
         const proximity = "value: "+element.proximity
         const temperature = "value: "+element.temperature
-        const timestamp = "timestamp: "+element.when
+        const timestamp = "timestamp: "+element.measureTime
 
         document.getElementById("history").innerHTML = '<h6>'+cells+'<\/h6>'
     });
