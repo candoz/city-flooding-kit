@@ -99,6 +99,7 @@
   <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
   <script src="https://sdk.amazonaws.com/js/aws-sdk-2.479.0.min.js"></script>
 
+  <script src="js/polling.js"></script>
   <script src="js/init-map.js"></script>
   <script src="js/aws-sdk-shadow.js"></script>
   <script>
@@ -107,6 +108,13 @@
       x.className = "show";
       setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
     }
+
+    poll(askForShadow(), 4000, 2000)
+    .then(function() {
+        console.log("Hello there")
+    }).catch(function() {
+        console.log("Polling timed out")
+    })
     </script>
   
 </body>

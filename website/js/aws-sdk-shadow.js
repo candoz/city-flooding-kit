@@ -9,10 +9,12 @@ AWS.config.credentials = new AWS.CognitoIdentityCredentials({ "IdentityPoolId": 
 const iotData = new AWS.IotData({ "endpoint": IOT_BROKER_ENDPOINT })
 const paramsGet = { "thingName": IOT_THING_NAME }
 
-iotData.getThingShadow(paramsGet, function (err, data) {
-    if (err) {
-        console.log("Error while trying to get AlarmStation shadow: " + err, err.stack)
-    } else {
-        console.log(JSON.stringify(data));
-    }
-})
+function askForShadow() {
+    iotData.getThingShadow(paramsGet, function (err, data) {
+        if (err) {
+            console.log("Error while trying to get AlarmStation shadow: " + err, err.stack)
+        } else {
+            console.log(JSON.stringify(data));
+        }
+    })
+}
