@@ -10,14 +10,16 @@ const iotData = new AWS.IotData({ "endpoint": IOT_BROKER_ENDPOINT })
 const paramsGet = { "thingName": IOT_THING_NAME }
 
 function askForShadow() {
-    return "ciao"
-    iotData.getThingShadow(paramsGet, function (err, data) {
+    return iotData.getThingShadow(paramsGet, function (err, data) {
         if (err) {
             console.log("Error while trying to get AlarmStation shadow: " + err, err.stack)
             return "errore"
         } else {
-           // console.log(JSON.stringify(data));
-            return data.payload
+            const payload = JSON.parse(data.payload)
+            console.log(payload.state.desired.alarmTime)
+
+
+            return JSON.stringify()
         }
     })
 }

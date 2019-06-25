@@ -69,7 +69,7 @@
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
     <div class="container">
       <a class="navbar-brand" href="#">City Flooding Kit</a>
-      <a onclick="myFunction()" class="fa fa-exclamation-triangle navbar-brand" aria-hidden="true"></a>
+      <a id="inconAlarm"onclick="myFunction()" class="fa fa-exclamation-triangle navbar-brand" aria-hidden="true"></a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -91,7 +91,7 @@
     </div>
   </nav>
 
-  <div id="snackbar">Some text some message..</div>
+  <div id="snackbar"></div>
   <div id="map" class="map" style="width: 100%; height: 775px"></div>
 
   <script src="vendor/jquery/jquery.slim.min.js"></script>
@@ -100,19 +100,8 @@
   <script src="https://sdk.amazonaws.com/js/aws-sdk-2.479.0.min.js"></script>
 
   <script src="js/init-map.js"></script>
-  <script src="js/aws-sdk-shadow.js"></script>
-  <script>
-    function myFunction() {
-      var x = document.getElementById("snackbar");
-      x.className = "show";
-      setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
-    }
-
-
-    setInterval( () => {
-      const res = askForShadow()
-      console.log(res)}, 2000)
-    </script>
+  <script src="js/snackbar.js"></script>
+  <script src="js/polling-alarm.js"></script>
   
 </body>
 
