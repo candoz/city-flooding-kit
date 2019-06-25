@@ -8,13 +8,8 @@ function poll(fn, timeout, interval) {
         if(result) {
             resolve(result);
         }
-        // If the condition isn't met but the timeout hasn't elapsed, go again
-        else if (Number(new Date()) < endTime) {
-            setTimeout(checkCondition, interval, resolve, reject);
-        }
-        // Didn't match and too much time, reject!
         else {
-            reject(new Error('timed out for ' + fn + ': ' + arguments));
+            setTimeout(checkCondition, interval);
         }
     };
 

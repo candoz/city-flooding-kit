@@ -13,8 +13,10 @@ function askForShadow() {
     iotData.getThingShadow(paramsGet, function (err, data) {
         if (err) {
             console.log("Error while trying to get AlarmStation shadow: " + err, err.stack)
+            return "errore"
         } else {
-            console.log(JSON.stringify(data));
+           // console.log(JSON.stringify(data));
+            return data
         }
     })
 }

@@ -109,11 +109,11 @@
       setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
     }
 
-    poll(askForShadow(), 4000, 2000)
-    .then(function() {
-        console.log("Hello there")
-    }).catch(function() {
-        console.log("Polling timed out")
+    poll(askForShadow,4000, 2000)
+    .then(function(data) {
+        console.log("Hello there " + data)
+    }).catch(function(err) {
+        console.error("Polling timed out   " + err)
     })
     </script>
   
