@@ -1,7 +1,7 @@
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTShadowClient
 import json as JSON
 import serial
-import random, time, datetime
+import random, time
 
 # A random programmatic shadow client ID.
 SHADOW_CLIENT = "AlarmStation"
@@ -41,46 +41,46 @@ def myShadowUpdateCallback(payload, responseStatus, token):
 # Create, configure, and connect a shadow client.
 myShadowClient = AWSIoTMQTTShadowClient(SHADOW_CLIENT)
 myShadowClient.configureEndpoint(HOST_NAME, 8883)
-myShadowClient.configureCredentials(ROOT_CA, PRIVATE_KEY, CERT_FILE)
+myShadowClient.configureCredentials(ROOT_CA, PRIVATE_KEY,
+  CERT_FILE)
 myShadowClient.configureConnectDisconnectTimeout(10)
 myShadowClient.configureMQTTOperationTimeout(5)
 myShadowClient.connect()
 
 # Create a programmatic representation of the shadow.
-myDeviceShadow = myShadowClient.createShadowHandlerWithName(SHADOW_HANDLER, True)
+myDeviceShadow = myShadowClient.createShadowHandlerWithName(
+  SHADOW_HANDLER, True)
 
 
 def myCustomCallback(payload, responseStatus, token):
-    alarm= JSON.loads(str(payload))["state"]["desired"]["alarm"]
-    
-    if(alarm=="on"):
-        arduino.write(str.encode("N"))
-
-def updateCustomCallback(payload, responseStatus, token):
     if responseStatus == "timeout":
         print("Update request " + token + " time out!")
     if responseStatus == "accepted":
-        payloadDict = JSON.loads(payload)
+        payloadDict = json.loads(payload)
         print("~~~~~~~~~~~~~~~~~~~~~~~")
         print("Update request with token: " + token + " accepted!")
         print("property: " + str(payloadDict["state"]["desired"]["property"]))
         print("~~~~~~~~~~~~~~~~~~~~~~~\n\n")
     if responseStatus == "rejected":
-        print("Update request " + token + " rejected!")     
+        print("Update request " + token + " rejected!")
+
+        
 # Keep generating random test data until this script 
 # stops running.
 # To stop running this script, press Ctrl+C.
 while True:
-  myDeviceShadow.shadowGet(myCustomCallback, 1)
-  data = arduino.read()
-  
-  print("letto arduino    "+ str(data))
-  if str(data)=="b'F'":
-    print("entro if")
-    now = datetime.datetime.now()  # Store current datetime
-    now_str = now.isoformat()  # Convert to ISO 8601 string
-    JSONPayload = '{"state":{"desired":{"alarm":"off", "alarmTime":"'+now_str+'", "alarmReason":"" }}}'
-    myDeviceShadow.shadowUpdate(JSONPayload, updateCustomCallback, 5)
+    
+    try:
+        data = arduino.read()
+        print("letto arduino")
+        if data=="F":
+            print("entro if")
+            now = datetime.datetime.now()  # Store current datetime
+            now_str = now.isoformat()  # Convert to ISO 8601 string
+            JSONPayload = '{"state":{"desired":{"alarm":"off", "alarmTime":'+now_str+', "alarmReason":" "}}}'
+            deviceShadowHandler.shadowUpdate(JSONPayload, myCustomCallback, 5)
 
- 
-  time.sleep(8)
+        time.sleep(5)
+        
+    except KeyboardInterrupt:
+        print("\nMeasurement stopped by the User")
