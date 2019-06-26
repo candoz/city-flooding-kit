@@ -20,10 +20,11 @@ setInterval( () => {
             const alarm = payload.state.desired.alarm
             var alarmTime = JSON.stringify(payload.state.desired.alarmTime).replace("T"," ")
             var text_alarm = "Reason: "+ payload.state.desired.alarmReason+ " <br /> Timestamp: "+alarmTime
-            document.getElementById("snackbar").innerHTML= text_alarm
             if(alarm =="on"){
+                document.getElementById("snackbar").innerHTML= text_alarm
                 window.document.getElementById("inconAlarm").style="color: red;"
             }else{
+                document.getElementById("snackbar").innerHTML= "No alarm"
                 window.document.getElementById("inconAlarm").style="color: black;"
             }
             console.log(alarm)

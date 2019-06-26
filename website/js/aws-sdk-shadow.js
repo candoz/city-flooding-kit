@@ -18,7 +18,6 @@ function askForShadow() {
             const payload = JSON.parse(data.payload)
             console.log(payload.state.desired.alarmTime)
 
-
             return JSON.stringify()
         }
     })

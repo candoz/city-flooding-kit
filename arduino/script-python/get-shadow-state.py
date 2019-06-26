@@ -29,15 +29,6 @@ SHADOW_HANDLER = "AlarmStation"
 
 arduino = serial.Serial('COM3',9600)
 
-# Automatically called whenever the shadow is updated.
-def myShadowUpdateCallback(payload, responseStatus, token):
-  print()
-  print('UPDATE: $aws/things/' + SHADOW_HANDLER + 
-    '/shadow/update/#')
-  print("payload = " + payload)
-  print("responseStatus = " + responseStatus)
-  print("token = " + token)
-
 # Create, configure, and connect a shadow client.
 myShadowClient = AWSIoTMQTTShadowClient(SHADOW_CLIENT)
 myShadowClient.configureEndpoint(HOST_NAME, 8883)
@@ -74,13 +65,10 @@ while True:
   myDeviceShadow.shadowGet(myCustomCallback, 1)
   data = arduino.read()
   
-  print("letto arduino    "+ str(data))
   if str(data)=="b'F'":
-    print("entro if")
     now = datetime.datetime.now()  # Store current datetime
     now_str = now.isoformat()  # Convert to ISO 8601 string
     JSONPayload = '{"state":{"desired":{"alarm":"off", "alarmTime":"'+now_str+'", "alarmReason":"" }}}'
     myDeviceShadow.shadowUpdate(JSONPayload, updateCustomCallback, 5)
 
- 
   time.sleep(8)

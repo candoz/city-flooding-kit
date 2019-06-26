@@ -13,7 +13,24 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
   <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css" />
   <link rel="stylesheet" href="./css/sensor-kit.css" />
+<style>.divform{
+    border: 1px solid #000;
+    width: 200px;
+    height: 200px;
+}
 
+.divform h1{
+    text-align: center;
+    margin-top: -10px;
+    height: 20px;
+    line-height: 20px;
+    font-size: 15px;
+}
+
+divform h1 span{
+    background-color: white;
+}
+</style>
 </head>
 
 <body>
@@ -41,6 +58,26 @@
       </div>
     </div>
   </nav>
+
+  <div id="divform">
+      <h3><span>ADD YOUR KIT</span></h3>
+      <form>
+        <div class="form-group">
+          <label >KIT USERNAME</label>
+          <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="name-kit">
+          <small id="emailHelp" class="form-text text-muted">the username must be unique.</small>
+        </div>
+        <div class="form-group">
+          <label >LATITUDE</label>
+          <input type="text" class="form-control" id="lat" placeholder="30.0235" name="latitude">
+        </div>
+        <div class="form-group">
+            <label >LONGITUDE</label>
+            <input type="text" class="form-control" id="long" placeholder="10.3035" name="longitude">
+          </div>
+        <button type="submit" class="btn btn-primary">Add</button>
+      </form>
+  </div>
 
   <script src="vendor/jquery/jquery.slim.min.js"></script>
   <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
