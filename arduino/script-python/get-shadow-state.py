@@ -1,5 +1,7 @@
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTShadowClient
-import random, time, json
+import json as JSON
+import serial
+import random, time
 
 # A random programmatic shadow client ID.
 SHADOW_CLIENT = "AlarmStation"
@@ -25,6 +27,8 @@ CERT_FILE = "../../certs/alarm-station/e2360f5815-certificate.pem.crt"
 # A programmatic shadow handler name prefix.
 SHADOW_HANDLER = "AlarmStation"
 
+arduino = serial.Serial('COM3',9600)
+
 # Automatically called whenever the shadow is updated.
 def myShadowUpdateCallback(payload, responseStatus, token):
   print()
@@ -49,16 +53,15 @@ myDeviceShadow = myShadowClient.createShadowHandlerWithName(
 
 
 def myCustomCallback(payload, responseStatus, token):
-    shadow_data = json.loads(payload.read().decode())
+    alarm= JSON.loads(str(payload))["state"]["desired"]["alarm"]
+    
+    if(alarm=="on"):
+        arduino.write(str.encode("N"))
 
-    print(shadow_data)
+        
 # Keep generating random test data until this script 
 # stops running.
 # To stop running this script, press Ctrl+C.
 while True:
     myDeviceShadow.shadowGet(myCustomCallback, 1)
     time.sleep(8)
-    
- 
-
-
