@@ -61,26 +61,28 @@ divform h1 span{
 
   <div id="divform">
       <h3><span>ADD YOUR KIT</span></h3>
-      <form>
+      <div id="myForm">
         <div class="form-group">
           <label >KIT USERNAME</label>
-          <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="name-kit">
+          <input class="form-control" id="kitUser"  placeholder="name-kit">
           <small id="emailHelp" class="form-text text-muted">the username must be unique.</small>
         </div>
         <div class="form-group">
           <label >LATITUDE</label>
-          <input type="text" class="form-control" id="lat" placeholder="30.0235" name="latitude">
+          <input class="form-control" id="lat" placeholder="30.0235" name="latitude">
         </div>
         <div class="form-group">
             <label >LONGITUDE</label>
-            <input type="text" class="form-control" id="long" placeholder="10.3035" name="longitude">
+            <input class="form-control" id="long" placeholder="10.3035" name="longitude">
           </div>
-        <button type="submit" class="btn btn-primary">Add</button>
-      </form>
+        <button class="btn btn-primary" onclick="mySubmit()" >Add</button>
+        </div>
   </div>
 
   <script src="vendor/jquery/jquery.slim.min.js"></script>
   <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  
+  <script src="js/submit-administrator.js"></script>
 
 </body>
 
