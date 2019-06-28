@@ -34,16 +34,16 @@ topic = "flooding-kit/ponte-vecchio-kit"
 
 aws_iot_mqtt_client.connect()
 
-# Get I2C bus
-bus = smbus.SMBus(1)
+bus = smbus.SMBus(1) # I2C bus
 
-#Setup GPIO for proximity sensor
 GPIO.setmode(GPIO.BCM)
 GPIO_TRIGGER = 24
 GPIO_ECHO = 23
+GPIO_RAIN = 7
 
 GPIO.setup(GPIO_TRIGGER, GPIO.OUT)
 GPIO.setup(GPIO_ECHO, GPIO.IN)
+GPIO.setup(GPIO_RAIN, GPIO.IN)
 
 def readDistance():
     # set Trigger to HIGH
@@ -202,17 +202,23 @@ if __name__ == '__main__':
     try:
         counter = 0
         while True:
+
+            if GPIO.input(GPIO_RAIN) == 1:
+                print("Non sta piovendo")
+            else:
+                print("Piove che Dio la manda")
+
             counter = counter + 1
             distance = readDistance()
             temperature, pressure, humidity = readBME280All()
             now = datetime.datetime.now()
             now_str = now.isoformat()  # Convert to ISO 8601
             msg = '{"itemId":' + str(counter) + ', "proximity":' + str(round(distance)) + ', "temperature":' + str(temperature) + ', "humidity":' + str(humidity) + ', "pressure":' + str(pressure) +  ', "measureTime":"' + now_str + '"}'
-            print ("Measured Distance = %.1f cm" % distance)
-            print ("Measured Pressure = %.1f mPa" % pressure)
-            print ("Measured Temperature = %.1f C" % temperature)
-            print ("Measured Humidity = %.1f %%" % humidity)
-            print ("Datetime = " + now_str)
+            print("Measured Distance = %.1f cm" % distance)
+            print("Measured Pressure = %.1f mPa" % pressure)
+            print("Measured Temperature = %.1f C" % temperature)
+            print("Measured Humidity = %.1f %%" % humidity)
+            print("Datetime = " + now_str)
             aws_iot_mqtt_client.publish(topic, msg, 0)
             time.sleep(8)
     except KeyboardInterrupt:

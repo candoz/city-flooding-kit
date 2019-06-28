@@ -8,4 +8,4 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setup(7, GPIO.IN)
 state = GPIO.input(7)
 
-print("ehiii "+ state)
+print("ehiii "+ str(state))
