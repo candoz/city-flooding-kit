@@ -49,15 +49,11 @@ def myCustomCallback(payload, responseStatus, token):
 
 def updateCustomCallback(payload, responseStatus, token):
     if responseStatus == "timeout":
-        print("Update request " + token + " time out!")
+        print("time out!")
     if responseStatus == "accepted":
-        payloadDict = JSON.loads(payload)
-        print("~~~~~~~~~~~~~~~~~~~~~~~")
-        print("Update request with token: " + token + " accepted!")
-        print("property: " + str(payloadDict["state"]["desired"]["property"]))
-        print("~~~~~~~~~~~~~~~~~~~~~~~\n\n")
+        print("accepted")
     if responseStatus == "rejected":
-        print("Update request " + token + " rejected!")     
+        print("rejected!")     
 # Keep generating random test data until this script 
 # stops running.
 # To stop running this script, press Ctrl+C.

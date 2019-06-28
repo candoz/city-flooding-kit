@@ -54,9 +54,5 @@ function mySubmit() {
             
 
         }).catch(error => console.error(error))
-        
-
-   
-       
-    }
+}
     
