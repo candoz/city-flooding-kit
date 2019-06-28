@@ -16,9 +16,9 @@ aws_iot_mqtt_client = None
 aws_iot_mqtt_client = AWSIoTMQTTClient("basicPubSub")
 port = 8883
 host = "azhkicv1gj9gc-ats.iot.us-east-2.amazonaws.com"
-rootCA_path = "./certs/flooding-kit/AmazonRootCA1.pem"
-private_key_path = "./certs/flooding-kit/19ecbe119d-private.pem.key"
-certificate_path = "./certs/flooding-kit/19ecbe119d-certificate.pem.crt"
+rootCA_path = "../certs/flooding-kit/AmazonRootCA1.pem"
+private_key_path = "../certs/flooding-kit/19ecbe119d-private.pem.key"
+certificate_path = "../certs/flooding-kit/19ecbe119d-certificate.pem.crt"
 
 aws_iot_mqtt_client.configureEndpoint(host, port)
 aws_iot_mqtt_client.configureCredentials(rootCA_path, private_key_path, certificate_path)
@@ -205,8 +205,8 @@ if __name__ == '__main__':
             counter = counter + 1
             distance = readDistance()
             temperature, pressure, humidity = readBME280All()
-            now = datetime.datetime.now()  # Store current datetime
-            now_str = now.isoformat()  # Convert to ISO 8601 string
+            now = datetime.datetime.now()
+            now_str = now.isoformat()  # Convert to ISO 8601
             msg = '{"itemId":' + str(counter) + ', "proximity":' + str(round(distance)) + ', "temperature":' + str(temperature) + ', "humidity":' + str(humidity) + ', "pressure":' + str(pressure) +  ', "measureTime":"' + now_str + '"}'
             print ("Measured Distance = %.1f cm" % distance)
             print ("Measured Pressure = %.1f mPa" % pressure)
@@ -216,6 +216,6 @@ if __name__ == '__main__':
             aws_iot_mqtt_client.publish(topic, msg, 0)
             time.sleep(8)
     except KeyboardInterrupt:
-        print("\nMeasurement stopped by the User")
+        print("\nMeasurement stopped by the User\n")
     finally:
         GPIO.cleanup()
