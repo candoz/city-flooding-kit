@@ -202,18 +202,12 @@ if __name__ == '__main__':
     try:
         counter = 0
         while True:
-
-            if GPIO.input(GPIO_RAIN) == 1:
-                print("Non sta piovendo")
-            else:
-                print("Piove che Dio la manda")
-
             counter = counter + 1
             distance = readDistance()
             temperature, pressure, humidity = readBME280All()
             now = datetime.datetime.now()
-            now_str = now.isoformat()  # Convert to ISO 8601
-            msg = '{"itemId":' + str(counter) + ', "proximity":' + str(round(distance)) + ', "temperature":' + str(temperature) + ', "humidity":' + str(humidity) + ', "pressure":' + str(pressure) +  ', "measureTime":"' + now_str + '"}'
+            now_str = now.strftime("%d %b %Y %H:%M:%S")  
+            msg = '{"itemId":' + str(counter) + ', "proximity":' + str(round(distance)) + ', "temperature":' + str(temperature) + ', "humidity":' + str(round(humidity) + ', "pressure":' + str(pressure) + ', "raining":' + str(GPIO.input(GPIO_RAIN) != 1) + ', "measureTime":"' + now_str + '"}'
             print("Measured Distance = %.1f cm" % distance)
             print("Measured Pressure = %.1f mPa" % pressure)
             print("Measured Temperature = %.1f C" % temperature)
