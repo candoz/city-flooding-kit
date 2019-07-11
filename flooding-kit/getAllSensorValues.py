@@ -243,7 +243,7 @@ if __name__ == '__main__':
             print("Measured Temperature = % C" % temperature)
             print("Measured Humidity = % %%" % humidity)
             
-            msg = '{"itemId":' + str(counter) + ', "proximity":' + str(proximity) + ', "temperature":' + str(temperature) + ', "humidity":' + str(humidity) + ', "pressure":' + str(pressure) + ', "raining":' + raining + ', "measureTime":"' + str(timestamp) + '"}'
+            msg = '{ "measureTime":' + str(timestamp) + ', "proximity":' + str(proximity) + ', "temperature":' + str(temperature) + ', "humidity":' + str(humidity) + ', "pressure":' + str(pressure) + ', "raining":' + raining + '"}'
             
             aws_iot_mqtt_client.publish(topic, msg, 0)
             
