@@ -213,14 +213,13 @@ if __name__ == '__main__':
         
         while True:
             
-            print("Starting value acquisition cicles...")
+            print("\nStarting new acquisition cicle...")
             for i in range(READS):
                 proximities[i] = readDistance()
                 temperatures[i], pressures[i], humidities[i] = readBME280All()
                 time.sleep(SECONDS_BETWEEN_READS)
             
-            print("Checking if it's raining")
-            raining = GPIO.input(GPIO_RAIN) != 1
+            timestamp = int(time.time())
             
             proximities.sort()
             temperatures.sort()
@@ -232,23 +231,33 @@ if __name__ == '__main__':
             clean_pressures = pressures[LOWEST_READS_TO_DISCARD : -HIGHEST_READS_TO_DISCARD]
             clean_humidities = humidities[LOWEST_READS_TO_DISCARD : -HIGHEST_READS_TO_DISCARD]
             
-            proximity = round(sum(clean_proximities) / len(clean_proximities))
+            proximity = round(sum(clean_proximities) / len(clean_proximities), 1)
             temperature = round(sum(clean_temperatures) / len(clean_temperatures), 1)
             pressure = round(sum(clean_pressures) / len(clean_pressures), 2)
             humidity = round(sum(clean_humidities) / len(clean_humidities), 1)
             
-            timestamp = int(time.time())
-            
+            raining = GPIO.input(GPIO_RAIN) != 1
+
             print("Timestamp = %s " % str(timestamp))
-            print("Measured Distance = %s cm" % str(proximity))
-            print("Measured Pressure = %s mPa" % str(pressure))
-            print("Measured Temperature = %s C" % str(temperature))
-            print("Measured Humidity = %s %%" % str(humidity))
+            print("Distance = %s cm" % str(proximity))
+            print("Pressure = %s mPa" % str(pressure))
+            print("Temperature = %s C" % str(temperature))
+            print("Humidity = %s %%" % str(humidity))
             
-            msg = '{ "measureTime":' + str(timestamp) + ', "proximity":' + str(proximity) + ', "temperature":' + str(temperature) + ', "humidity":' + str(humidity) + ', "pressure":' + str(pressure) + ', "raining":' + str(raining) + '"}'
-            
+            if raining:
+                print("It's raining!")
+            else:
+                print("It's not raining")
+
+            msg = ('{ "measureTime":' + str(timestamp)
+                + ', "proximity":' + str(proximity)
+                + ', "temperature":' + str(temperature)
+                + ', "humidity":' + str(humidity)
+                + ', "pressure":' + str(pressure)
+                + ', "raining":' + (str(raining)).lower() + '}')
+
             aws_iot_mqtt_client.publish(topic, msg, 0)
-            
+
     except KeyboardInterrupt:
         print("\nMeasurement stopped by the User\n")
     finally:
