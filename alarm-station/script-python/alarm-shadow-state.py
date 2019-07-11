@@ -6,21 +6,21 @@ import random, time, datetime
 # A random programmatic shadow client ID.
 SHADOW_CLIENT = "AlarmStation"
 
-# The unique hostname that &IoT; generated for 
+# The unique hostname that &IoT; generated for
 # this device.
 HOST_NAME = "azhkicv1gj9gc-ats.iot.us-east-2.amazonaws.com"
 
-# The relative path to the correct root CA file for &IoT;, 
+# The relative path to the correct root CA file for &IoT;,
 # which you have already saved onto this device.
-ROOT_CA = "../../certs/alarm-station/AmazonRootCA1.pem" 
+ROOT_CA = "../../certs/alarm-station/AmazonRootCA1.pem"
 
-# The relative path to your private key file that 
-# &IoT; generated for this device, which you 
+# The relative path to your private key file that
+# &IoT; generated for this device, which you
 # have already saved onto this device.
 PRIVATE_KEY = "../../certs/alarm-station/e2360f5815-private.pem.key"
 
-# The relative path to your certificate file that 
-# &IoT; generated for this device, which you 
+# The relative path to your certificate file that
+# &IoT; generated for this device, which you
 # have already saved onto this device.
 CERT_FILE = "../../certs/alarm-station/e2360f5815-certificate.pem.crt"
 
@@ -43,9 +43,9 @@ myDeviceShadow = myShadowClient.createShadowHandlerWithName(SHADOW_HANDLER, True
 
 def myCustomCallback(payload, responseStatus, token):
     alarm= JSON.loads(str(payload))["state"]["desired"]["alarm"]
-    
+
     if(alarm=="on"):
-        arduino.write(str.encode("1"))
+        arduino.write(str.encode("T"))
 
 def updateCustomCallback(payload, responseStatus, token):
     if responseStatus == "timeout":
@@ -53,15 +53,15 @@ def updateCustomCallback(payload, responseStatus, token):
     if responseStatus == "accepted":
         print("accepted")
     if responseStatus == "rejected":
-        print("rejected!")     
-# Keep generating random test data until this script 
+        print("rejected!")
+# Keep generating random test data until this script
 # stops running.
 # To stop running this script, press Ctrl+C.
 while True:
   myDeviceShadow.shadowGet(myCustomCallback, 1)
   data = arduino.read()
-  
-  if str(data)== "0":
+
+  if str(data)== "b'F'":
     now = datetime.datetime.now()  # Store current datetime
     now_str = now.isoformat()  # Convert to ISO 8601 string
     JSONPayload = '{"state":{"desired":{"alarm":"off", "alarmTime":"'+now_str+'", "alarmReason":"" }}}'
