@@ -11,7 +11,7 @@ from ctypes import c_ubyte
 
 DEVICE = 0x76 # 0x77 was default device I2C address
 
-# Configure SDK settings
+# Configure AWS IoT SDK settings
 aws_iot_mqtt_client = None
 aws_iot_mqtt_client = AWSIoTMQTTClient("basicPubSub")
 port = 8883
@@ -44,6 +44,59 @@ GPIO_RAIN = 7
 GPIO.setup(GPIO_TRIGGER, GPIO.OUT)
 GPIO.setup(GPIO_ECHO, GPIO.IN)
 GPIO.setup(GPIO_RAIN, GPIO.IN)
+
+
+if __name__ == '__main__':
+    try:
+        READS = 10
+        LOWEST_READS_TO_DISCARD = 3
+        HIGHEST_READS_TO_DISCARD = 3
+        SECONDS_BETWEEN_READS = 1
+        
+        proximities = [0] * READS
+        temperatures = [0] * READS
+        pressures = [0] * READS
+        humidities = [0] * READS
+        
+        while True:
+            
+            for i in range(READS):
+                proximities[i] = readDistance()
+                temperatures[i], pressures[i], humidities[i] = readBME280All()
+                time.sleep(SECONDS_BETWEEN_READS)
+            raining = GPIO.input(GPIO_RAIN) != 1
+            
+            proximities.sort()
+            temperatures.sort()
+            pressures.sort()
+            humidities.sort()
+            
+            clean_proximities = proximities[LOWEST_READS_TO_DISCARD : -HIGHEST_READS_TO_DISCARD]
+            clean_temperatures = temperatures[LOWEST_READS_TO_DISCARD : -HIGHEST_READS_TO_DISCARD]
+            clean_pressures = pressures[LOWEST_READS_TO_DISCARD : -HIGHEST_READS_TO_DISCARD]
+            clean_humidities = humidities[LOWEST_READS_TO_DISCARD : -HIGHEST_READS_TO_DISCARD]
+            
+            proximity = round(sum(clean_proximities) / len(clean_proximities))
+            temperature = round(sum(temperature) / len(temperature), 1)
+            pressure = round(sum(pressure) / len(pressure), 2)
+            humidity = round(sum(humidity) / len(humidity), 1)
+            
+            timestamp = int(time.time())
+            now_str = now.strftime("%d %b %Y %H:%M:%S") 
+            print("Datetime = " + now_str)
+            print("Measured Distance = % cm" % proximity)
+            print("Measured Pressure = % mPa" % pressure)
+            print("Measured Temperature = % C" % temperature)
+            print("Measured Humidity = % %%" % humidity)
+            
+            msg = '{"itemId":' + str(counter) + ', "proximity":' + str(proximity) + ', "temperature":' + str(temperature) + ', "humidity":' + str(humidity) + ', "pressure":' + str(pressure) + ', "raining":' + raining + ', "measureTime":"' + str(timestamp) + '"}'
+            
+            aws_iot_mqtt_client.publish(topic, msg, 0)
+            
+    except KeyboardInterrupt:
+        print("\nMeasurement stopped by the User\n")
+    finally:
+        GPIO.cleanup()
 
 def readDistance():
     # set Trigger to HIGH
@@ -196,26 +249,4 @@ def readBME280All(addr=DEVICE):
     elif humidity < 0:
         humidity = 0
 
-    return temperature/100.0,pressure/100.0,humidity
-
-if __name__ == '__main__':
-    try:
-        counter = 0
-        while True:
-            counter = counter + 1
-            distance = readDistance()
-            temperature, pressure, humidity = readBME280All()
-            now = datetime.datetime.now()
-            now_str = now.strftime("%d %b %Y %H:%M:%S")  
-            msg = '{"itemId":' + str(counter) + ', "proximity":' + str(round(distance)) + ', "temperature":' + str(temperature) + ', "humidity":' + str(round(humidity) + ', "pressure":' + str(pressure) + ', "raining":' + str(GPIO.input(GPIO_RAIN) != 1) + ', "measureTime":"' + now_str + '"}'
-            print("Measured Distance = %.1f cm" % distance)
-            print("Measured Pressure = %.1f mPa" % pressure)
-            print("Measured Temperature = %.1f C" % temperature)
-            print("Measured Humidity = %.1f %%" % humidity)
-            print("Datetime = " + now_str)
-            aws_iot_mqtt_client.publish(topic, msg, 0)
-            time.sleep(8)
-    except KeyboardInterrupt:
-        print("\nMeasurement stopped by the User\n")
-    finally:
-        GPIO.cleanup()
+    return temperature/100.0, pressure/100.0, humidity
