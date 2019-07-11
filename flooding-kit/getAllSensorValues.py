@@ -255,9 +255,9 @@ if __name__ == '__main__':
                 + ', "humidity":' + str(humidity)
                 + ', "pressure":' + str(pressure)
                 + ', "raining":' + (str(raining)).lower() + '}')
-            
+
             aws_iot_mqtt_client.publish(topic, msg, 0)
-            
+
     except KeyboardInterrupt:
         print("\nMeasurement stopped by the User\n")
     finally:
