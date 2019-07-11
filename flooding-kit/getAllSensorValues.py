@@ -45,59 +45,6 @@ GPIO.setup(GPIO_TRIGGER, GPIO.OUT)
 GPIO.setup(GPIO_ECHO, GPIO.IN)
 GPIO.setup(GPIO_RAIN, GPIO.IN)
 
-
-if __name__ == '__main__':
-    try:
-        READS = 10
-        LOWEST_READS_TO_DISCARD = 3
-        HIGHEST_READS_TO_DISCARD = 3
-        SECONDS_BETWEEN_READS = 1
-        
-        proximities = [0] * READS
-        temperatures = [0] * READS
-        pressures = [0] * READS
-        humidities = [0] * READS
-        
-        while True:
-            
-            for i in range(READS):
-                proximities[i] = readDistance()
-                temperatures[i], pressures[i], humidities[i] = readBME280All()
-                time.sleep(SECONDS_BETWEEN_READS)
-            raining = GPIO.input(GPIO_RAIN) != 1
-            
-            proximities.sort()
-            temperatures.sort()
-            pressures.sort()
-            humidities.sort()
-            
-            clean_proximities = proximities[LOWEST_READS_TO_DISCARD : -HIGHEST_READS_TO_DISCARD]
-            clean_temperatures = temperatures[LOWEST_READS_TO_DISCARD : -HIGHEST_READS_TO_DISCARD]
-            clean_pressures = pressures[LOWEST_READS_TO_DISCARD : -HIGHEST_READS_TO_DISCARD]
-            clean_humidities = humidities[LOWEST_READS_TO_DISCARD : -HIGHEST_READS_TO_DISCARD]
-            
-            proximity = round(sum(clean_proximities) / len(clean_proximities))
-            temperature = round(sum(temperature) / len(temperature), 1)
-            pressure = round(sum(pressure) / len(pressure), 2)
-            humidity = round(sum(humidity) / len(humidity), 1)
-            
-            timestamp = int(time.time())
-            now_str = now.strftime("%d %b %Y %H:%M:%S") 
-            print("Datetime = " + now_str)
-            print("Measured Distance = % cm" % proximity)
-            print("Measured Pressure = % mPa" % pressure)
-            print("Measured Temperature = % C" % temperature)
-            print("Measured Humidity = % %%" % humidity)
-            
-            msg = '{"itemId":' + str(counter) + ', "proximity":' + str(proximity) + ', "temperature":' + str(temperature) + ', "humidity":' + str(humidity) + ', "pressure":' + str(pressure) + ', "raining":' + raining + ', "measureTime":"' + str(timestamp) + '"}'
-            
-            aws_iot_mqtt_client.publish(topic, msg, 0)
-            
-    except KeyboardInterrupt:
-        print("\nMeasurement stopped by the User\n")
-    finally:
-        GPIO.cleanup()
-
 def readDistance():
     # set Trigger to HIGH
     GPIO.output(GPIO_TRIGGER, True)
@@ -250,3 +197,57 @@ def readBME280All(addr=DEVICE):
         humidity = 0
 
     return temperature/100.0, pressure/100.0, humidity
+
+
+if __name__ == '__main__':
+    try:
+        READS = 10
+        LOWEST_READS_TO_DISCARD = 3
+        HIGHEST_READS_TO_DISCARD = 3
+        SECONDS_BETWEEN_READS = 1
+        
+        proximities = [0] * READS
+        temperatures = [0] * READS
+        pressures = [0] * READS
+        humidities = [0] * READS
+        
+        while True:
+            
+            for i in range(READS):
+                proximities[i] = readDistance()
+                temperatures[i], pressures[i], humidities[i] = readBME280All()
+                time.sleep(SECONDS_BETWEEN_READS)
+            
+            raining = GPIO.input(GPIO_RAIN) != 1
+            
+            proximities.sort()
+            temperatures.sort()
+            pressures.sort()
+            humidities.sort()
+            
+            clean_proximities = proximities[LOWEST_READS_TO_DISCARD : -HIGHEST_READS_TO_DISCARD]
+            clean_temperatures = temperatures[LOWEST_READS_TO_DISCARD : -HIGHEST_READS_TO_DISCARD]
+            clean_pressures = pressures[LOWEST_READS_TO_DISCARD : -HIGHEST_READS_TO_DISCARD]
+            clean_humidities = humidities[LOWEST_READS_TO_DISCARD : -HIGHEST_READS_TO_DISCARD]
+            
+            proximity = round(sum(clean_proximities) / len(clean_proximities))
+            temperature = round(sum(temperature) / len(temperature), 1)
+            pressure = round(sum(pressure) / len(pressure), 2)
+            humidity = round(sum(humidity) / len(humidity), 1)
+            
+            timestamp = int(time.time())
+            now_str = now.strftime("%d %b %Y %H:%M:%S") 
+            print("Datetime = " + now_str)
+            print("Measured Distance = % cm" % proximity)
+            print("Measured Pressure = % mPa" % pressure)
+            print("Measured Temperature = % C" % temperature)
+            print("Measured Humidity = % %%" % humidity)
+            
+            msg = '{"itemId":' + str(counter) + ', "proximity":' + str(proximity) + ', "temperature":' + str(temperature) + ', "humidity":' + str(humidity) + ', "pressure":' + str(pressure) + ', "raining":' + raining + ', "measureTime":"' + str(timestamp) + '"}'
+            
+            aws_iot_mqtt_client.publish(topic, msg, 0)
+            
+    except KeyboardInterrupt:
+        print("\nMeasurement stopped by the User\n")
+    finally:
+        GPIO.cleanup()
