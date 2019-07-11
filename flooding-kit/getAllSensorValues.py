@@ -213,11 +213,13 @@ if __name__ == '__main__':
         
         while True:
             
+            print("Starting value acquisition cicles...")
             for i in range(READS):
                 proximities[i] = readDistance()
                 temperatures[i], pressures[i], humidities[i] = readBME280All()
                 time.sleep(SECONDS_BETWEEN_READS)
             
+            print("Checking if it's raining")
             raining = GPIO.input(GPIO_RAIN) != 1
             
             proximities.sort()
@@ -231,19 +233,19 @@ if __name__ == '__main__':
             clean_humidities = humidities[LOWEST_READS_TO_DISCARD : -HIGHEST_READS_TO_DISCARD]
             
             proximity = round(sum(clean_proximities) / len(clean_proximities))
-            temperature = round(sum(temperature) / len(temperature), 1)
-            pressure = round(sum(pressure) / len(pressure), 2)
-            humidity = round(sum(humidity) / len(humidity), 1)
+            temperature = round(sum(clean_temperatures) / len(clean_temperatures), 1)
+            pressure = round(sum(clean_pressures) / len(clean_pressures), 2)
+            humidity = round(sum(clean_humidities) / len(clean_humidities), 1)
             
             timestamp = int(time.time())
-            now_str = now.strftime("%d %b %Y %H:%M:%S") 
-            print("Datetime = " + now_str)
-            print("Measured Distance = % cm" % proximity)
-            print("Measured Pressure = % mPa" % pressure)
-            print("Measured Temperature = % C" % temperature)
-            print("Measured Humidity = % %%" % humidity)
             
-            msg = '{ "measureTime":' + str(timestamp) + ', "proximity":' + str(proximity) + ', "temperature":' + str(temperature) + ', "humidity":' + str(humidity) + ', "pressure":' + str(pressure) + ', "raining":' + raining + '"}'
+            print("Timestamp = %s " % str(timestamp))
+            print("Measured Distance = %s cm" % str(proximity))
+            print("Measured Pressure = %s mPa" % str(pressure))
+            print("Measured Temperature = %s C" % str(temperature))
+            print("Measured Humidity = %s %%" % str(humidity))
+            
+            msg = '{ "measureTime":' + str(timestamp) + ', "proximity":' + str(proximity) + ', "temperature":' + str(temperature) + ', "humidity":' + str(humidity) + ', "pressure":' + str(pressure) + ', "raining":' + str(raining) + '"}'
             
             aws_iot_mqtt_client.publish(topic, msg, 0)
             
