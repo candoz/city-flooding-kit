@@ -45,7 +45,7 @@ def myCustomCallback(payload, responseStatus, token):
     alarm= JSON.loads(str(payload))["state"]["desired"]["alarm"]
     
     if(alarm=="on"):
-        arduino.write(str.encode("N"))
+        arduino.write(str.encode("1"))
 
 def updateCustomCallback(payload, responseStatus, token):
     if responseStatus == "timeout":
@@ -61,7 +61,7 @@ while True:
   myDeviceShadow.shadowGet(myCustomCallback, 1)
   data = arduino.read()
   
-  if str(data)=="b'F'":
+  if str(data)== "0":
     now = datetime.datetime.now()  # Store current datetime
     now_str = now.isoformat()  # Convert to ISO 8601 string
     JSONPayload = '{"state":{"desired":{"alarm":"off", "alarmTime":"'+now_str+'", "alarmReason":"" }}}'

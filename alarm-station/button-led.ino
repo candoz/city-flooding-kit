@@ -16,14 +16,14 @@ void loop() {
   if (Serial.available()) {
     char incoming = Serial.read();
     Serial.print(""+incoming);
-    if (incoming == 'N') {
+    if (incoming == "1") {
       digitalWrite(LED, HIGH);
     }
   }
 
   if (buttonState == HIGH){
     digitalWrite(LED, LOW);
-    Serial.print('F');
+    Serial.print("0");
   }
 
   

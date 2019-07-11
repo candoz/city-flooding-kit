@@ -21,9 +21,9 @@ function openNav(sensorType) {
     const type = sensorType.toString().toLowerCase()
     responseData.Items.forEach(element => {
         const value = "value: "+element[type]
-        let time = "timestamp: "+element.measureTime
-        time = time.replace("T", " ")
-        history_txt = history_txt+"<h5 align='left'>"+value+' &nbsp&nbsp '+time+'<\/h5>'
+        var time = new Date(element.measureTime*1000).toLocaleString()
+
+        history_txt = history_txt+"<h5 align='center'>"+value+' &nbsp&nbsp '+time+'<\/h5>'
     });
     document.getElementById("myNav").style.width = "100%"
     document.getElementById("history").style.color = "white"
