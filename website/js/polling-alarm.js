@@ -18,7 +18,7 @@ setInterval( () => {
         } else {
             const payload = JSON.parse(data.payload)
             const alarm = payload.state.desired.alarm
-            var alarmTime = JSON.stringify(payload.state.desired.alarmTime).replace("T"," ")
+            var alarmTime = new Date(payload.state.desired.alarmTime*1000).toLocaleString()
             var text_alarm = "Reason: "+ payload.state.desired.alarmReason+ " <br /> Timestamp: "+alarmTime
             if(alarm =="on"){
                 document.getElementById("snackbar").innerHTML= text_alarm

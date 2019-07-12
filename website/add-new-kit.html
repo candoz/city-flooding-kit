@@ -61,24 +61,40 @@ divform h1 span{
   </nav>
 
   <div style="margin-bottom:10%;margin-left: 5%;margin-top: 5%; margin-right: 10%;" id="divform">
-      <h3><span>LOG IN </span></h3>
+      <h3><span>ADD YOUR KIT</span></h3>
       <div id="myForm">
         <div class="form-group">
-          <label >USERNAME</label>
-          <input class="form-control" id="username"  placeholder="username">
+          <label >KIT USERNAME</label>
+          <input class="form-control" id="kitUser"  placeholder="name-kit">
+          <small id="emailHelp" class="form-text text-muted">the username must be unique.</small>
         </div>
         <div class="form-group">
-          <label >PASSWORD</label>
-          <input type="password" class="form-control" id="psw" placeholder="password" name="psw">
+          <label >LATITUDE</label>
+          <input class="form-control" id="lat" placeholder="30.0235" name="latitude">
         </div>
-        <button class="btn btn-primary" onclick="authentication()" >Submit</button>
+        <div class="form-group">
+            <label >LONGITUDE</label>
+            <input class="form-control" id="long" placeholder="10.3035" name="longitude">
+          </div>
+        <button class="btn btn-primary" onclick="mySubmit()" >Add</button>
         </div>
+  </div>
+
+  <div style="margin-bottom:10%;margin-left: 5%;margin-top: 5%; margin-right: 10%" id="AWSconsole">
+    <h3><span>CONFIGURE YOUR KIT </span></h3>
+    <p><a href=https://aws.amazon.com/it/console/>Enter into console</a></p>
+    <p>You can:</p>
+    <ul>
+        <li>create/edit/delete a rule to manage the data and the alarm</li>
+        <li>configure a new kit</li>
+        <li>create new functionalities through Lamda Function </li>
+      </ul>
   </div>
 
   <script src="vendor/jquery/jquery.slim.min.js"></script>
   <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   
-  <script src="js/authentication.js"></script>
+  <script src="js/submit-administrator.js"></script>
 
 </body>
 
