@@ -11,7 +11,9 @@
   <title>City Flooding Kit</title>
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
+  <link  rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="./css/sensor-kit.css" />
+  <link rel="stylesheet" href="css/snackbar.css" />
   <!-- Bootstrap core CSS -->
   <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css" />
 
@@ -24,6 +26,7 @@
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
     <div class="container">
       <a class="navbar-brand" href="#">City Flooding Kit</a>
+      <a id="inconAlarm" onclick="myFunction()" class="fa fa-exclamation-triangle navbar-brand" aria-hidden="true"></a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -85,16 +88,20 @@
     </div>
 </div>
 
+<div id="snackbar"></div>
+
 </div>
 
   <script src="vendor/jquery/jquery.slim.min.js"></script>
   <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+  <script src="https://sdk.amazonaws.com/js/aws-sdk-2.479.0.min.js"></script>
   
   <script src="js/init-map.js"></script> 
   <script src="js/get-kit-name.js"></script>
   <script src="js/overlay-bar.js"></script>
-  <script src="js/get-current-values.js"></script>
+  <script src="js/polling-alarm-kit.js"></script>
+  <script src="js/snackbar.js"></script>
 
 </body>
 
