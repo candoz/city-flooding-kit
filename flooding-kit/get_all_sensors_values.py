@@ -5,7 +5,7 @@ import RPi.GPIO as GPIO
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTShadowClient
 
-import hc-sr04
+import hc_sr04
 import bme280
 
 DEVICE = 0x76 # 0x77 was default device I2C address
