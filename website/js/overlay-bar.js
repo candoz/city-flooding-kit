@@ -1,4 +1,5 @@
 function openNav(sensorType) {
+    var sortedItems = new Array()
     var history_txt =""
     var urlParams = new URLSearchParams(window.location.search)
     var kid = urlParams.get("kitId")
@@ -20,8 +21,12 @@ function openNav(sensorType) {
     }).then(responseData => {
     const type = sensorType.toString().toLowerCase()
     responseData.Items.forEach(element => {
-        const value = "value: "+element[type]
-        var time = new Date(element.measureTime*1000).toLocaleString()
+        sortedItems.push({"value":element[type], "timestamp": element.measureTime*1000})
+    });
+    sortedItems.sort((a, b) => (a.timestamp < b.timestamp) ? 1 : -1)
+    sortedItems.forEach(element => {
+        const value = "value: "+element.value
+        var time = new Date(element.timestamp).toLocaleString()
 
         history_txt = history_txt+"<h5 align='center'>"+value+' &nbsp&nbsp '+time+'<\/h5>'
     });
