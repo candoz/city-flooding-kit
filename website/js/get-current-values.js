@@ -1,5 +1,6 @@
 var urlParams = new URLSearchParams(window.location.search)
 var kitId = urlParams.get("kitId")
+var sortedItems = new Array()
 
 const NOT_AVAILABLE_STR = "Not available"
 
@@ -18,21 +19,24 @@ fetch("https://54q6hpps8a.execute-api.us-east-2.amazonaws.com/prod/manager", {
     return response.json();
   
 }).then(responseData => {
-    const element = responseData.Items[0]
-    if (element != undefined) {
-        const humidity = element.humidity+" %"
-        const pressure = element.pressure+" mPa"
-        const proximity = element.proximity+" cm"
-        const temperature = element.temperature+ "°C"
+    responseData.Items.forEach(element => {
+        sortedItems.push({"humidity":element['humidity'],"pressure":element['pressure'],"proximity":element['proximity'],"temperature":element['temperature'], "timestamp": element.measureTime*1000})
+    });
+    sortedItems.sort((a, b) => (a.timestamp < b.timestamp) ? 1 : -1)
+    const currentElement = sortedItems[0]
+    if (currentElement != undefined) {
+        const humidity = currentElement.humidity+" %"
+        const pressure = currentElement.pressure+" mPa"
+        const proximity = currentElement.proximity+" cm"
+        const temperature = currentElement.temperature+ "°C"
         var raining=""
-        console.log(element.raining)
-        if(element.raining){
+        if(currentElement.raining){
             raining = "YES"
         }else{
             raining= "NO"
         }
             
-        var time = new Date(element.measureTime*1000).toLocaleString()
+        var time = new Date(currentElement.timestamp).toLocaleString()
         
         document.getElementById("value-pressure").innerHTML = pressure
         document.getElementById("value-humidity").innerHTML = humidity
@@ -45,7 +49,7 @@ fetch("https://54q6hpps8a.execute-api.us-east-2.amazonaws.com/prod/manager", {
         document.getElementById("value-humidity").innerHTML = NOT_AVAILABLE_STR
         document.getElementById("value-proximity").innerHTML = NOT_AVAILABLE_STR
         document.getElementById("value-temperature").innerHTML = NOT_AVAILABLE_STR
-        document.getElementById("value-rain").innerHTML = NOT_AVAILABLE_STR
+        document.getElementById("value-raining").innerHTML = NOT_AVAILABLE_STR
     }
 
 }).catch(error => console.error(error))
