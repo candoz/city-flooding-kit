@@ -1,4 +1,5 @@
 import time
+import RPi.GPIO as GPIO
 
 def readDistance(trigger, echo):
     # set Trigger to HIGH
@@ -6,7 +7,7 @@ def readDistance(trigger, echo):
 
     # set Trigger after 0.01ms to LOW
     time.sleep(0.00001)
-    GPIO.output(echo, False)
+    GPIO.output(trigger, False)
 
     StartTime = time.time()
     StopTime = time.time()
@@ -24,4 +25,4 @@ def readDistance(trigger, echo):
     # multiply with the sonic speed (34300 cm/s) and divide by 2, because there and back
     distance = (TimeElapsed * 34300) / 2
 
-    return distance 
+    return distance

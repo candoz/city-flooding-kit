@@ -36,6 +36,7 @@ aws_iot_mqtt_client.connect()
 bus = smbus.SMBus(1) # I2C bus
 
 GPIO.setmode(GPIO.BCM)
+
 GPIO_TRIGGER = 24
 GPIO_ECHO = 23
 GPIO_RAIN = 7
@@ -60,8 +61,8 @@ if __name__ == '__main__':
             
             print("\nStarting new acquisition cicle...")
             for i in range(READS):
-                proximities[i] = hc-sr04.readDistance(trigger, echo)
-                temperatures[i], pressures[i], humidities[i] = bme280.readBME280All(address, bus)
+                proximities[i] = hc_sr04.readDistance(GPIO_TRIGGER, GPIO_ECHO)
+                temperatures[i], pressures[i], humidities[i] = bme280.readBME280All(DEVICE, bus)
                 time.sleep(SECONDS_BETWEEN_READS)
             
             timestamp = int(time.time())
