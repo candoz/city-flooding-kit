@@ -21,6 +21,8 @@ function authentication() {
         responseData.Items.forEach(element => {
         if(element.username == username && element.password == password){
                 window.location.href = "add-new-kit.html";
+        }else{
+            window.alert("Wrong Credential.")
         }
         });
 

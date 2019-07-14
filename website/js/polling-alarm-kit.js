@@ -1,4 +1,13 @@
-setInterval( () => {
+
+   setInterval( () => {
+   
+    getCurrentValue();
+    getAlarm();
+
+  } , 2000) 
+  
+  
+  function getAlarm(){
     const IOT_BROKER_ENDPOINT = "azhkicv1gj9gc-ats.iot.us-east-2.amazonaws.com" // also called the REST API endpoint
     const IOT_BROKER_REGION = "us-east-2"
     const IOT_THING_NAME = "AlarmStation"
@@ -9,8 +18,6 @@ setInterval( () => {
 
     const iotData = new AWS.IotData({ "endpoint": IOT_BROKER_ENDPOINT })
     const paramsGet = { "thingName": IOT_THING_NAME }
-
-    getCurrentValue()
 
     iotData.getThingShadow(paramsGet, function (err, data) {
         if (err) {
@@ -32,9 +39,9 @@ setInterval( () => {
             return data.payload
         }
     })
-} , 2000)
+  }
 
-function getCurrentValue(){
+  function getCurrentValue(){
     var urlParams = new URLSearchParams(window.location.search)
     var kitId = urlParams.get("kitId")
     var sortedItems = new Array()
@@ -91,4 +98,4 @@ function getCurrentValue(){
 
     }).catch(error => console.error(error))
 
-}
+  }
