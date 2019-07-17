@@ -26,9 +26,19 @@ myDeviceShadow = myShadowClient.createShadowHandlerWithName(SHADOW_HANDLER, True
 
 def myCustomCallback(payload, responseStatus, token):
     alarm= JSON.loads(str(payload))["state"]["desired"]["alarm"]
-
+    print("alarmm  "+ alarm)
     if(alarm=="on"):
+        print("on")
         arduino.write(str.encode("T"))
+            
+    data = arduino.read()
+
+    if str(data)== "b'F'":
+        now = datetime.datetime.now()
+        now_str = now.isoformat()  # Convert to ISO 8601 string
+        JSONPayload = '{"state":{"desired":{"alarm":"off", "alarmTime":"'+now_str+'", "alarmReason":"" }}}'
+        myDeviceShadow.shadowUpdate(JSONPayload, updateCustomCallback, 5)
+    
 
 def updateCustomCallback(payload, responseStatus, token):
     if responseStatus == "timeout":
@@ -40,12 +50,5 @@ def updateCustomCallback(payload, responseStatus, token):
 
 while True:
     myDeviceShadow.shadowGet(myCustomCallback, 1)
-    data = arduino.read()
-
-    if str(data)== "b'F'":
-        now = datetime.datetime.now()
-        now_str = now.isoformat()  # Convert to ISO 8601 string
-        JSONPayload = '{"state":{"desired":{"alarm":"off", "alarmTime":"'+now_str+'", "alarmReason":"" }}}'
-        myDeviceShadow.shadowUpdate(JSONPayload, updateCustomCallback, 5)
-
-    time.sleep(8)
+    
+    time.sleep(4)
