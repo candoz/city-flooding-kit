@@ -64,7 +64,7 @@
     
     }).then(responseData => {
         responseData.Items.forEach(element => {
-            sortedItems.push({"humidity":element['humidity'],"pressure":element['pressure'],"proximity":element['proximity'],"temperature":element['temperature'], "timestamp": element.measureTime*1000})
+            sortedItems.push({"humidity":element['humidity'],"pressure":element['pressure'],"proximity":element['proximity'],"temperature":element['temperature'],"raining":element['raining'], "timestamp": element.measureTime*1000})
         });
         sortedItems.sort((a, b) => (a.timestamp < b.timestamp) ? 1 : -1)
         const currentElement = sortedItems[0]
@@ -74,7 +74,8 @@
             const proximity = currentElement.proximity+" cm"
             const temperature = currentElement.temperature+ "°C"
             var raining=""
-            if(currentElement.raining){
+
+            if(currentElement.raining==true){
                 raining = "YES"
             }else{
                 raining= "NO"
