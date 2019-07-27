@@ -12,7 +12,7 @@ CERT_FILE = "../../certs/alarm-station/e2360f5815-certificate.pem.crt"
 SHADOW_CLIENT = "AlarmStation"
 SHADOW_HANDLER = "AlarmStation"
 TIMEOUT_IN_SECONDS = 2
-SECONDS_TO_SLEEP = 4
+SECONDS_TO_SLEEP = 5
 
 ARDUINO_SERIAL = serial.Serial('COM3', 9600)
 
@@ -28,30 +28,32 @@ MY_SHADOW_CLIENT.connect()
 MY_DEVICE_SHADOW = MY_SHADOW_CLIENT.createShadowHandlerWithName(SHADOW_HANDLER, True)
 
 def get_shadow_callback(payload, response_status, token):
+    
     state = JSON.loads(str(payload))["state"]
-    alarm = state["desired"]["alarm"]
-    print("alarm: "+ alarm)
-    if alarm == "on":
-        ARDUINO_SERIAL.write(str.encode("T"))
-    else:
-        ARDUINO_SERIAL.write(str.encode("L"))
-    state["reported"] = state["desired"]
-    MY_DEVICE_SHADOW.shadowUpdate(state, update_shadow_callback, TIMEOUT_IN_SECONDS)
+    desired = state["desired"]
+    if desired["alarm"] == "on":
+        ARDUINO_SERIAL.write(str.encode("H"))
+        to_update = '{"state":{"reported":' + JSON.dumps(desired) + '}}'
+        MY_DEVICE_SHADOW.shadowUpdate(to_update, update_shadow_callback, TIMEOUT_IN_SECONDS)
 
     data = ARDUINO_SERIAL.read()
-    if str(data) == "b'F'":
+    if str(data) == "b'B'": 
         now = datetime.datetime.now()
         now_str = now.isoformat()  # Convert to ISO 8601 string
-        json_payload = ('{"state":{"desired":{"alarm":"off", "alarmTime":"' +
-                        now_str + '", "alarmReason":"" }}}')
+        json_payload = ('{"state":{' + 
+                        '"desired":{"alarm":"off", "alarmTime":"' + now_str + '", "alarmReason":""}' +
+                        '"reported":{"alarm":"off", "alarmTime":"' + now_str + '", "alarmReason":""}' +
+                        '}}')
         MY_DEVICE_SHADOW.shadowUpdate(json_payload, update_shadow_callback, TIMEOUT_IN_SECONDS)
+        ARDUINO_SERIAL.write(str.encode("L"))
 
 def update_shadow_callback(payload, response_status, token):
-    if response_status == "timeout":
-        print("report update timed out!")
     if response_status == "accepted":
         print("report update accepted")
-    if response_status == "rejected":
+    elif response_status == "timeout":
+        print("report update timed out!")
+        # Opt for an automatic retry?
+    elif response_status == "rejected":
         print("report rejected!")
 
 while True:
