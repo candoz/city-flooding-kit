@@ -2,3 +2,4 @@ certs/
 *.kate-swp
 *.save
 *.pyc
+.vscode
