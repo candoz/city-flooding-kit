@@ -1,7 +1,7 @@
 #define LED 13
 #define BUTTON 7
 
-int button_state = 0;
+int button_state = LOW;
 bool was_low = true;
 
 void setup() {

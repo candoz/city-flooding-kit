@@ -1,0 +1,2 @@
+AWSIoTPythonSDK==1.4.7
+pyserial==3.4

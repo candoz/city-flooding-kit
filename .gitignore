@@ -1,4 +1,5 @@
 certs/
+env/
 *.kate-swp
 *.save
 *.pyc

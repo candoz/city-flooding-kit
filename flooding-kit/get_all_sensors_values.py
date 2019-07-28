@@ -6,16 +6,16 @@ import RPi.GPIO as GPIO
 import hc_sr04
 import bme280
 
-DEVICE = 0x76 # 0x77 was default device I2C address
+DEVICE = 0x76  # 0x77 was default device I2C address
 TOPIC = "flooding-kit/ponte-vecchio-kit"
 
 # Configure AWS IoT SDK settings
 AWS_IOT_MQTT_CLIENT = AWSIoTMQTTClient("basicPubSub")
 port = 8883
 host = "azhkicv1gj9gc-ats.iot.us-east-2.amazonaws.com"
-rootCA_path = "../certs/flooding-kit/AmazonRootCA1.pem"
-private_key_path = "../certs/flooding-kit/19ecbe119d-private.pem.key"
-certificate_path = "../certs/flooding-kit/19ecbe119d-certificate.pem.crt"
+rootCA_path = "certs/flooding-kit/AmazonRootCA1.pem"
+private_key_path = "certs/flooding-kit/19ecbe119d-private.pem.key"
+certificate_path = "certs/flooding-kit/19ecbe119d-certificate.pem.crt"
 
 AWS_IOT_MQTT_CLIENT.configureEndpoint(host, port)
 AWS_IOT_MQTT_CLIENT.configureCredentials(rootCA_path, private_key_path, certificate_path)
@@ -28,7 +28,7 @@ AWS_IOT_MQTT_CLIENT.configureConnectDisconnectTimeout(10)  # 10 sec
 AWS_IOT_MQTT_CLIENT.configureMQTTOperationTimeout(5)  # 5 sec
 AWS_IOT_MQTT_CLIENT.connect()
 
-bus = smbus.SMBus(1) # I2C bus
+bus = smbus.SMBus(1)  # I2C bus
 
 GPIO.setmode(GPIO.BCM)
 
