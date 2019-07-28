@@ -5,9 +5,9 @@ import serial
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTShadowClient
 
 HOST_NAME = "azhkicv1gj9gc-ats.iot.us-east-2.amazonaws.com"
-ROOT_CA = "../certs/alarm-station/AmazonRootCA1.pem"
-PRIVATE_KEY = "../certs/alarm-station/e2360f5815-private.pem.key"
-CERT_FILE = "../certs/alarm-station/e2360f5815-certificate.pem.crt"
+ROOT_CA = "./certs/AmazonRootCA1.pem"
+PRIVATE_KEY = "./certs/e2360f5815-private.pem.key"
+CERT_FILE = "./certs/e2360f5815-certificate.pem.crt"
 
 SHADOW_CLIENT = "AlarmStation"
 SHADOW_HANDLER = "AlarmStation"
