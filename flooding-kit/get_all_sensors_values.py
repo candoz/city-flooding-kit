@@ -76,26 +76,23 @@ try:
 
         raining = GPIO.input(GPIO_RAIN) != 1  # True if GPIO_RAIN == 0
 
-        print(
-            f"Timestamp = {timestamp}\n"
-            f"Proximity = {proximity} cm\n"
-            f"Temperature = {temperature} C\n"
-            f"Pressure = {pressure} mPa\n"
-            f"Humidity = {humidity} %%"
-        )
+        print("Timestamp = %s " % str(timestamp))
+        print("Proximity = %s cm" % str(proximity))
+        print("Pressure = %s mPa" % str(pressure))
+        print("Temperature = %s C" % str(temperature))
+        print("Humidity = %s %%" % str(humidity))
+
         if raining:
             print("It's raining!")
         else:
             print("It's not raining")
 
-        msg = (
-            f'{{"measureTime":{timestamp},'
-            f'"proximity":{proximity},'
-            f'"temperature":{temperature},'
-            f'"humidity":{humidity},'
-            f'"pressure":{pressure},'
-            f'"raining":{(str(raining)).lower()}}}'
-        )
+        msg = ('{ "measureTime":' + str(timestamp) +
+               ', "proximity":' + str(proximity) +
+               ', "temperature":' + str(temperature) +
+               ', "humidity":' + str(humidity) +
+               ', "pressure":' + str(pressure) +
+               ', "raining":' + (str(raining)).lower() + '}')
 
         AWS_IOT_MQTT_CLIENT.publish(TOPIC, msg, 0)
 
