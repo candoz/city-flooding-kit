@@ -1,8 +1,8 @@
 # City Flooding Kit
 
-This project lies in the context of the smart environment, regarding prevention and warning systems for environmental disasters concerning, in particular, river flooding.  
+This project lies in the context of the smart environment, regarding prevention and **warning systems** for environmental disasters concerning, in particular, river flooding.  
 
-The goal of our work is to provide a configurable kit for hypothetical public authorities, to effectively monitor the critical conditions that precede a possible emergency situation.  
+The goal of our work is to provide a configurable kit for hypothetical public authorities, to effectively monitor the critical conditions that precede an emergency situation.  
 
 ## Course reference
 
