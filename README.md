@@ -16,3 +16,7 @@ https://github.com/candoz/city-flooding-kit/blob/master/presentation.pdf
 
 A complete project report in Italian language is available here:  
 https://github.com/candoz/city-flooding-kit/blob/master/report.pdf  
+
+## Flooding Kit and Alarm Station souvenir photo
+
+![Some sweet hardware](hardware.jpeg)
