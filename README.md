@@ -11,11 +11,8 @@ https://www.unibo.it/en/teaching/course-unit-catalogue/course-unit/2019/412645
 
 ## Report and documentation
 
-A brief presentation in Italian language is available here:  
-https://github.com/candoz/city-flooding-kit/blob/master/presentation.pdf
-
-A complete project report in Italian language is available here:  
-https://github.com/candoz/city-flooding-kit/blob/master/report.pdf  
+- [A brief presentation in Italian language](presentation.pdf)  
+- [A complete project report in Italian language](report.pdf)  
 
 ## Flooding Kit and Alarm Station souvenir photo
 
