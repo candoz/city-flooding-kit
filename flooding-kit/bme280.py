@@ -1,13 +1,16 @@
 import time
 from ctypes import c_short
 
+
 def get_short(data, index):
     # return two bytes from data as a signed 16-bit value
     return c_short((data[index+1] << 8) + data[index]).value
 
+
 def get_ushort(data, index):
     # return two bytes from data as an unsigned 16-bit value
     return (data[index+1] << 8) + data[index]
+
 
 def get_char(data, index):
     # return one byte from data as a signed char
@@ -16,10 +19,12 @@ def get_char(data, index):
         result -= 256
     return result
 
+
 def get_uchar(data, index):
     # return one byte from data as an unsigned char
     result = data[index] & 0xFF
     return result
+
 
 def read_bme280_id(addr, bus):
     # Chip ID Register Address
@@ -27,15 +32,16 @@ def read_bme280_id(addr, bus):
     (chip_id, chip_version) = bus.read_i2c_block_data(addr, REG_ID, 2)
     return (chip_id, chip_version)
 
+
 def read_bme280_all(addr, bus):
     # Register Addresses
     REG_DATA = 0xF7
     REG_CONTROL = 0xF4
-    REG_CONFIG = 0xF5
+    # REG_CONFIG = 0xF5
 
     REG_CONTROL_HUM = 0xF2
-    REG_HUM_MSB = 0xFD
-    REG_HUM_LSB = 0xFE
+    # REG_HUM_MSB = 0xFD
+    # REG_HUM_LSB = 0xFE
 
     # Oversample setting - page 27
     OVERSAMPLE_TEMP = 2
@@ -46,7 +52,7 @@ def read_bme280_all(addr, bus):
     OVERSAMPLE_HUM = 2
     bus.write_byte_data(addr, REG_CONTROL_HUM, OVERSAMPLE_HUM)
 
-    control = OVERSAMPLE_TEMP<<5 | OVERSAMPLE_PRES<<2 | MODE
+    control = OVERSAMPLE_TEMP << 5 | OVERSAMPLE_PRES << 2 | MODE
     bus.write_byte_data(addr, REG_CONTROL, control)
 
     # Read blocks of calibration data from EEPROM
@@ -96,10 +102,10 @@ def read_bme280_all(addr, bus):
     temp_raw = (data[3] << 12) | (data[4] << 4) | (data[5] >> 4)
     hum_raw = (data[6] << 8) | data[7]
 
-    #Refine temperature
-    var1 = ((((temp_raw>>3) - (dig_T1<<1))) * (dig_T2)) >> 11
-    var2 = (((((temp_raw>>4) - (dig_T1)) * ((temp_raw>>4) - (dig_T1))) >> 12) * (dig_T3)) >> 14
-    t_fine = var1+var2
+    # Refine temperature
+    var1 = (((temp_raw >> 3) - (dig_T1 << 1)) * (dig_T2)) >> 11
+    var2 = ((((temp_raw >> 4) - (dig_T1) * ((temp_raw >> 4) - (dig_T1))) >> 12) * dig_T3) >> 14
+    t_fine = var1 + var2
     temperature = float(((t_fine * 5) + 128) >> 8)
 
     # Refine pressure and adjust for temperature

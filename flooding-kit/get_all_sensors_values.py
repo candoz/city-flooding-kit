@@ -1,4 +1,5 @@
 import time
+from statistics import mean
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 import smbus
 import RPi.GPIO as GPIO
@@ -9,18 +10,21 @@ import bme280
 DEVICE = 0x76  # 0x77 was default device I2C address
 TOPIC = "flooding-kit/ponte-vecchio-kit"
 
+READS_PER_CYCLE = 10
+LOWEST_READS_TO_DISCARD = 3
+HIGHEST_READS_TO_DISCARD = 3
+SECONDS_BETWEEN_READS = 1
+
 # Configure AWS IoT SDK settings
 AWS_IOT_MQTT_CLIENT = AWSIoTMQTTClient("basicPubSub")
-port = 8883
-host = "azhkicv1gj9gc-ats.iot.us-east-2.amazonaws.com"
-rootCA_path = "certs/flooding-kit/AmazonRootCA1.pem"
-private_key_path = "certs/flooding-kit/19ecbe119d-private.pem.key"
-certificate_path = "certs/flooding-kit/19ecbe119d-certificate.pem.crt"
+PORT = 8883
+HOST = "azhkicv1gj9gc-ats.iot.us-east-2.amazonaws.com"
+ROOT_CA_PATH = "./certs/AmazonRootCA1.pem"
+PRIVATE_KEY_PATH = "./certs/19ecbe119d-private.pem.key"
+CERTIFICATE_PATH = "./certs/19ecbe119d-certificate.pem.crt"
 
-AWS_IOT_MQTT_CLIENT.configureEndpoint(host, port)
-AWS_IOT_MQTT_CLIENT.configureCredentials(rootCA_path, private_key_path, certificate_path)
-
-# AWSIoTMQTTClient connection configuration
+AWS_IOT_MQTT_CLIENT.configureEndpoint(HOST, PORT)
+AWS_IOT_MQTT_CLIENT.configureCredentials(ROOT_CA_PATH, PRIVATE_KEY_PATH, CERTIFICATE_PATH)
 AWS_IOT_MQTT_CLIENT.configureAutoReconnectBackoffTime(1, 32, 20)
 AWS_IOT_MQTT_CLIENT.configureOfflinePublishQueueing(-1)  # Infinite offline Publish queueing
 AWS_IOT_MQTT_CLIENT.configureDrainingFrequency(2)  # Draining: 2 Hz
@@ -40,66 +44,62 @@ GPIO.setup(GPIO_TRIGGER, GPIO.OUT)
 GPIO.setup(GPIO_ECHO, GPIO.IN)
 GPIO.setup(GPIO_RAIN, GPIO.IN)
 
-if __name__ == '__main__':
-    try:
-        READS = 10
-        LOWEST_READS_TO_DISCARD = 3
-        HIGHEST_READS_TO_DISCARD = 3
-        SECONDS_BETWEEN_READS = 1
+proximities = [0] * READS_PER_CYCLE
+temperatures = [0] * READS_PER_CYCLE
+pressures = [0] * READS_PER_CYCLE
+humidities = [0] * READS_PER_CYCLE
 
-        proximities = [0] * READS
-        temperatures = [0] * READS
-        pressures = [0] * READS
-        humidities = [0] * READS
+try:
+    while True:
+        print("\nStarting new acquisition cicle...")
+        for i in range(READS_PER_CYCLE):
+            proximities[i] = hc_sr04.read_distance(GPIO_TRIGGER, GPIO_ECHO)
+            temperatures[i], pressures[i], humidities[i] = bme280.read_bme280_all(DEVICE, bus)
+            time.sleep(SECONDS_BETWEEN_READS)
 
-        while True:
+        timestamp = int(time.time())
 
-            print("\nStarting new acquisition cicle...")
-            for i in range(READS):
-                proximities[i] = hc_sr04.read_distance(GPIO_TRIGGER, GPIO_ECHO)
-                temperatures[i], pressures[i], humidities[i] = bme280.read_bme280_all(DEVICE, bus)
-                time.sleep(SECONDS_BETWEEN_READS)
+        proximities.sort()
+        temperatures.sort()
+        pressures.sort()
+        humidities.sort()
 
-            timestamp = int(time.time())
+        trimmed_proximities = proximities[LOWEST_READS_TO_DISCARD:-HIGHEST_READS_TO_DISCARD]
+        trimmed_temperatures = temperatures[LOWEST_READS_TO_DISCARD:-HIGHEST_READS_TO_DISCARD]
+        trimmed_pressures = pressures[LOWEST_READS_TO_DISCARD:-HIGHEST_READS_TO_DISCARD]
+        trimmed_humidities = humidities[LOWEST_READS_TO_DISCARD:-HIGHEST_READS_TO_DISCARD]
 
-            proximities.sort()
-            temperatures.sort()
-            pressures.sort()
-            humidities.sort()
+        proximity = round(mean(trimmed_proximities), 1)
+        temperature = round(mean(trimmed_temperatures), 1)
+        pressure = round(mean(trimmed_pressures), 2)
+        humidity = round(mean(trimmed_humidities), 1)
 
-            clean_proximities = proximities[LOWEST_READS_TO_DISCARD : -HIGHEST_READS_TO_DISCARD]
-            clean_temperatures = temperatures[LOWEST_READS_TO_DISCARD : -HIGHEST_READS_TO_DISCARD]
-            clean_pressures = pressures[LOWEST_READS_TO_DISCARD : -HIGHEST_READS_TO_DISCARD]
-            clean_humidities = humidities[LOWEST_READS_TO_DISCARD : -HIGHEST_READS_TO_DISCARD]
+        raining = GPIO.input(GPIO_RAIN) != 1  # True if GPIO_RAIN == 0
 
-            proximity = round(sum(clean_proximities) / len(clean_proximities), 1)
-            temperature = round(sum(clean_temperatures) / len(clean_temperatures), 1)
-            pressure = round(sum(clean_pressures) / len(clean_pressures), 2)
-            humidity = round(sum(clean_humidities) / len(clean_humidities), 1)
+        print(
+            f"Timestamp = {timestamp}\n"
+            f"Proximity = {proximity} cm\n"
+            f"Temperature = {temperature} C\n"
+            f"Pressure = {pressure} mPa\n"
+            f"Humidity = {humidity} %%"
+        )
+        if raining:
+            print("It's raining!")
+        else:
+            print("It's not raining")
 
-            raining = GPIO.input(GPIO_RAIN) != 1
+        msg = (
+            f'{{"measureTime":{timestamp},'
+            f'"proximity":{proximity},'
+            f'"temperature":{temperature},'
+            f'"humidity":{humidity},'
+            f'"pressure":{pressure},'
+            f'"raining":{(str(raining)).lower()}}}'
+        )
 
-            print("Timestamp = %s " % str(timestamp))
-            print("Distance = %s cm" % str(proximity))
-            print("Pressure = %s mPa" % str(pressure))
-            print("Temperature = %s C" % str(temperature))
-            print("Humidity = %s %%" % str(humidity))
+        AWS_IOT_MQTT_CLIENT.publish(TOPIC, msg, 0)
 
-            if raining:
-                print("It's raining!")
-            else:
-                print("It's not raining")
-
-            MSG = ('{ "measureTime":' + str(timestamp) +
-                   ', "proximity":' + str(proximity) +
-                   ', "temperature":' + str(temperature) +
-                   ', "humidity":' + str(humidity) +
-                   ', "pressure":' + str(pressure) +
-                   ', "raining":' + (str(raining)).lower() + '}')
-
-            AWS_IOT_MQTT_CLIENT.publish(TOPIC, MSG, 0)
-
-    except KeyboardInterrupt:
-        print("\nMeasurement stopped by the User\n")
-    finally:
-        GPIO.cleanup()
+except KeyboardInterrupt:
+    print("\nMeasurement stopped by the User\n")
+finally:
+    GPIO.cleanup()

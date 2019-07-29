@@ -1,6 +1,7 @@
 import time
 import RPi.GPIO as GPIO
 
+
 def read_distance(trigger, echo):
 
     # set Trigger to HIGH, then after 0.01ms to LOW
